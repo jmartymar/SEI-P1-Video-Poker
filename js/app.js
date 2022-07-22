@@ -1,11 +1,15 @@
-//constants
-//state vars
-//chached elem references
-//event listeners
-//functions ill need
+/*----- constants -----*/
+/*----- app's state (variables) -----*/
+/*----- cached element references -----*/
+/*----- event listeners -----*/
+/*----- functions -----*/
 
+/*----- constants -----*/
 const cardSuits = ['clubs', 'diamonds', 'hearts', 'spades'];
-const cardValues = ['A', 'r02', 'r03', 'r04', 'r05', 'r06', 'r07', 'ro8', 'r09', 'r10', 'J', 'Q', 'K', 'A'];
+const cardValues = ['A', 'r02', 'r03', 'r04', 'r05', 'r06', 'r07', 'r08', 'r09', 'r10', 'J', 'Q', 'K', 'A'];
+const cards = buildCardsObj(); // build the cards obj which returns both the cardsObj and deckArr initial state
+const cardsObj = cards[0]; // initialize cardsObj - list of all card atributes
+const fullDeckArr = cards[1];
 const winningHands = {
     'Royal Flush' : {
         suitMatches: 5,                     // how many cards must have matching suits
@@ -98,6 +102,16 @@ const winningHands = {
         baseWinValue: 1
     }
 }
+
+// - initialize vars
+
+let deckArr = [...fullDeckArr];
+let handObj = [];
+let handArr = [];
+let standArr = [];
+
+
+//----------- cached elem references -------------------
 const cardEls = {
     0: document.getElementById('card1'), 
     1: document.getElementById('card2'),
@@ -105,22 +119,43 @@ const cardEls = {
     3: document.getElementById('card4'),
     4: document.getElementById('card5')
 }
+const standButtonEls = {
+    0: document.getElementById('stand1'), 
+    1: document.getElementById('stand2'),
+    2: document.getElementById('stand3'),
+    3: document.getElementById('stand4'),
+    4: document.getElementById('stand5')
+}
+
+const chipTotalEl = document.getElementById('chipTotal');
+const chipPileEl = document.getElementById('chip-pile');
+const currentBetEl = document.getElementById('current-bet');
+const currentHandValueEl = document.getElementById('hand-value');
+
+
+// --------- event listeners ----------------------------
+document.getElementById('stand1').addEventListener('click', function(){standCard(0)});
+document.getElementById('stand2').addEventListener('click', function(){standCard(1)});
+document.getElementById('stand3').addEventListener('click', function(){standCard(2)});
+document.getElementById('stand4').addEventListener('click', function(){standCard(3)});
+document.getElementById('stand5').addEventListener('click', function(){standCard(4)});
+
+document.getElementById('deal-button').addEventListener('click', playHand);
+
+
+
+
 
 //console.log(winningHands);
 //console.log(cardValues);
 
-let deckArr = [];
-let handObj = [];
-let handArr = [];
+
 
 init();
 function init() {
-
-const cards = buildCardsObj(); // build the cards obj which returns both the cardsObj and deckArr initial state
-cardsObj = cards[0]; // initialize cardsObj - list of all card atributes
-deckArr = cards[1]; // initialize deck with full deck of cards used
-handArr = [];
-//render();
+    handArr = [];
+    standArr = [];
+    //render();
 }
 
 //build the cards object;
@@ -157,28 +192,38 @@ function pickRandomCard(arr) {
     return randomCard; 
 }
 
-function buildHand(arr) {
-    let hand = [];
-    for(let i = 0; i < 5; i++) {
-        hand.push(pickRandomCard(arr));
+function buildHand(deckArr, cardsWantedArr, currentHand = []) {
+    //let hand = [];
+    for(let i in cardsWantedArr) {
+        currentHand[i] = pickRandomCard(deckArr);
     }
-return hand;
+return currentHand;
 }
 
 function playHand() {
     init();
-    let currentHand = buildHand(deckArr);
-    //console.log(currentHand);
-    //console.log(cardsObj);
-    for(let card in currentHand) {
-        //console.log(card);
-        //console.log(cardsObj[currentHand[card]]);
-        handArr.push({'imgUrl' : cardsObj[currentHand[card]].imgUrl});
-        //console.log(handArr);
-    }
-    
+    // if hand doesn't exist, build full hand, if hand exists, update hand
+    if(handArr.length == 0) {
+        let currentHand = buildHand(deckArr, [0, 1, 2, 3, 4]);
+        for(let card in currentHand) {
+            //console.log(card);
+            //console.log(cardsObj[currentHand[card]]);
+            handArr[card] = cardsObj[currentHand[card]];
+            //console.log(handArr);
+        }
+    } else {
+        let currentHand = buildHand(deckArr, standArr);
+    }  
+    console.log(standArr, '<---standArr');  
 render();
 }
+
+function standCard(num) {
+    standArr.push(num);
+    //console.log(standArr, '<-- standArr');
+render();
+}
+
 
 function render() {
     //console.log(handArr);
@@ -187,6 +232,16 @@ function render() {
         cardEls[cardEl].querySelector('img').src = handArr[cardEl].imgUrl;
         //console.log(cardEls[cardEl].src);
         //console.log(handArr[cardEl], '<-- handArr');
-    }  
+    }
+    for(let standButton in standButtonEls) {
+        //console.log(standArr.indexOf(standButton), '<-stand button');
+        cardEls[standButton].querySelector('img').style.border = standArr.includes(standButton) ? '2px solid red' : 'none';
+        standButtonEls[standButton].classList.remove(standArr.includes(standButton) ? 'btn-danger' : 'btn-info');
+        standButtonEls[standButton].classList.add(standArr.includes(standButton) ? 'btn-info' : 'btn-danger');
+
+    }
+
 }
+
+
 
