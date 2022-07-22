@@ -9,7 +9,7 @@ const cardSuits = ['clubs', 'diamonds', 'hearts', 'spades'];
 const cardValues = ['A', 'r02', 'r03', 'r04', 'r05', 'r06', 'r07', 'r08', 'r09', 'r10', 'J', 'Q', 'K', 'A'];
 const cards = buildCardsObj(); // build the cards obj which returns both the cardsObj and deckArr initial state
 const cardsObj = cards[0]; // initialize cardsObj - list of all card atributes
-const fullDeckArr = cards[1];
+const fullDeckArr = cards[1]; // initialize fullDeckArr - list of all card names in a deck
 const winningHands = {
     'Royal Flush' : {
         suitMatches: 5,                     // how many cards must have matching suits
@@ -103,15 +103,18 @@ const winningHands = {
     }
 }
 
-// - initialize vars
+/*----- app's state (variables) -----*/
 
 let deckArr = [...fullDeckArr];
 let handObj = [];
 let handArr = [];
 let standArr = [];
+let newGame = true;
+let currentHand = [];
+let drawArr = [];
 
 
-//----------- cached elem references -------------------
+/*----- cached element references -----*/
 const cardEls = {
     0: document.getElementById('card1'), 
     1: document.getElementById('card2'),
@@ -133,8 +136,8 @@ const currentBetEl = document.getElementById('current-bet');
 const currentHandValueEl = document.getElementById('hand-value');
 
 
-// --------- event listeners ----------------------------
-document.getElementById('stand1').addEventListener('click', function(){standCard(0)});
+/*----- event listeners -----*/
+standButtonEls[0].addEventListener('click', function(){standCard(0)});
 document.getElementById('stand2').addEventListener('click', function(){standCard(1)});
 document.getElementById('stand3').addEventListener('click', function(){standCard(2)});
 document.getElementById('stand4').addEventListener('click', function(){standCard(3)});
@@ -144,18 +147,21 @@ document.getElementById('deal-button').addEventListener('click', playHand);
 
 
 
-
-
-//console.log(winningHands);
-//console.log(cardValues);
-
-
-
 init();
+
+/*----- functions -----*/
 function init() {
-    handArr = [];
-    standArr = [];
-    //render();
+    //console.log(newGame);
+    //handArr = [];
+    if(newGame === true) { 
+        deckArr = [...fullDeckArr];
+        standArr = [];
+        drawArr = [];
+        currentHand = [];
+    } else {
+        render();
+    }
+    
 }
 
 //build the cards object;
@@ -192,34 +198,64 @@ function pickRandomCard(arr) {
     return randomCard; 
 }
 
-function buildHand(deckArr, cardsWantedArr, currentHand = []) {
+function buildHand(deckArr, cardsWantedArr = [0, 1, 2, 3, 4]) {
     //let hand = [];
-    for(let i in cardsWantedArr) {
-        currentHand[i] = pickRandomCard(deckArr);
+    for(i = 0; i <= 4; i++) {
+        if(cardsWantedArr.includes(i)) {
+            console.log('true');
+            currentHand[i] = pickRandomCard(deckArr);
+        } else {
+            //console.log(cardsWantedArr[i], 'false');
+            currentHand[i] = currentHand[i];
+        }
     }
+    //console.log(currentHand, '<-currentHand')
 return currentHand;
 }
 
 function playHand() {
-    init();
-    // if hand doesn't exist, build full hand, if hand exists, update hand
-    if(handArr.length == 0) {
-        let currentHand = buildHand(deckArr, [0, 1, 2, 3, 4]);
+    
+    // if new game, build full hand, else update hand
+    if(newGame) {
+        init();
+        currentHand = buildHand(deckArr);
         for(let card in currentHand) {
             //console.log(card);
             //console.log(cardsObj[currentHand[card]]);
             handArr[card] = cardsObj[currentHand[card]];
             //console.log(handArr);
         }
+        render();
+        newGame = false;
     } else {
-        let currentHand = buildHand(deckArr, standArr);
+        for(i = 0; i <= 4; i++) {
+            
+            if(!standArr.includes(i)) { drawArr.push(i) }
+            // console.log(drawArr, "<- drawArr");
+            // console.log(standArr[i], "<- standCardInd");
+        }
+        currentHand = buildHand(deckArr, drawArr);
+        console.log(currentHand, '<-currentHand');
+        for(let card in currentHand) {
+            //console.log(card);
+            //console.log(cardsObj[currentHand[card]]);
+            handArr[card] = cardsObj[currentHand[card]];
+            //console.log(handArr);
+        }        
+        render();
+        newGame = true;
     }  
-    console.log(standArr, '<---standArr');  
-render();
+    //console.log(standArr, '<---standArr');  
+
+
 }
 
 function standCard(num) {
-    standArr.push(num);
+    if(standArr.includes(num)) {
+        standArr = standArr.filter(value => value != num);
+    } else {
+        standArr.push(num);
+    }
     //console.log(standArr, '<-- standArr');
 render();
 }
@@ -229,18 +265,22 @@ function render() {
     //console.log(handArr);
     for(let cardEl in cardEls) {
         //console.log(cardEl, '<-- cardEl');
+        //console.log(cardEls, '<-- cardEls');
+        //console.log(handArr, '<--handArr');
+        //console.log(handArr[cardEl], '<-- handArr[cardEl]');
         cardEls[cardEl].querySelector('img').src = handArr[cardEl].imgUrl;
         //console.log(cardEls[cardEl].src);
         //console.log(handArr[cardEl], '<-- handArr');
     }
     for(let standButton in standButtonEls) {
-        //console.log(standArr.indexOf(standButton), '<-stand button');
-        cardEls[standButton].querySelector('img').style.border = standArr.includes(standButton) ? '2px solid red' : 'none';
-        standButtonEls[standButton].classList.remove(standArr.includes(standButton) ? 'btn-danger' : 'btn-info');
-        standButtonEls[standButton].classList.add(standArr.includes(standButton) ? 'btn-info' : 'btn-danger');
-
+        //console.log(typeof standButton);
+        //console.log(standArr, '<-standArr');
+        //console.log(standArr.includes(+standButton), '<-stand button bool');
+        //console.log(standButton, '<<-stand button')
+        cardEls[+standButton].querySelector('img').style.border = standArr.includes(+standButton) ? '2px solid red' : 'none';
+        standButtonEls[+standButton].classList.remove(standArr.includes(+standButton) ? 'btn-danger' : 'btn-info');
+        standButtonEls[+standButton].classList.add(standArr.includes(+standButton) ? 'btn-info' : 'btn-danger');    
     }
-
 }
 
 
