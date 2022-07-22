@@ -18,7 +18,7 @@ body{
 
 .cards {
     background-color: white;
-    min-height: 200px;
+    height: 200px;
 }
 
 .stand-row {
@@ -41,3 +41,17 @@ body{
 #add-funds-btn {
     margin: 20px auto;
 }
+
+#chip-total {
+    font-size: 2em;
+}
+
+.card-row > div {
+    padding: 0;
+    height: auto;
+}
+
+.card-row > div > img {
+    width: 100%;
+}
+
