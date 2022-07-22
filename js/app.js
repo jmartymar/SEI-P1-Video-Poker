@@ -138,10 +138,17 @@ const currentHandValueEl = document.getElementById('hand-value');
 
 /*----- event listeners -----*/
 standButtonEls[0].addEventListener('click', function(){standCard(0)});
-document.getElementById('stand2').addEventListener('click', function(){standCard(1)});
-document.getElementById('stand3').addEventListener('click', function(){standCard(2)});
-document.getElementById('stand4').addEventListener('click', function(){standCard(3)});
-document.getElementById('stand5').addEventListener('click', function(){standCard(4)});
+standButtonEls[1].addEventListener('click', function(){standCard(1)});
+standButtonEls[2].addEventListener('click', function(){standCard(2)});
+standButtonEls[3].addEventListener('click', function(){standCard(3)});
+standButtonEls[4].addEventListener('click', function(){standCard(4)});
+
+cardEls[0].addEventListener('click', function(){standCard(0)});
+cardEls[1].addEventListener('click', function(){standCard(1)});
+cardEls[2].addEventListener('click', function(){standCard(2)});
+cardEls[3].addEventListener('click', function(){standCard(3)});
+cardEls[4].addEventListener('click', function(){standCard(4)});
+
 
 document.getElementById('deal-button').addEventListener('click', playHand);
 
@@ -153,7 +160,7 @@ init();
 function init() {
     //console.log(newGame);
     //handArr = [];
-    if(newGame === true) { 
+    if(newGame) { 
         deckArr = [...fullDeckArr];
         standArr = [];
         drawArr = [];
@@ -202,7 +209,7 @@ function buildHand(deckArr, cardsWantedArr = [0, 1, 2, 3, 4]) {
     //let hand = [];
     for(i = 0; i <= 4; i++) {
         if(cardsWantedArr.includes(i)) {
-            console.log('true');
+            //console.log('true');
             currentHand[i] = pickRandomCard(deckArr);
         } else {
             //console.log(cardsWantedArr[i], 'false');
@@ -235,17 +242,19 @@ function playHand() {
             // console.log(standArr[i], "<- standCardInd");
         }
         currentHand = buildHand(deckArr, drawArr);
-        console.log(currentHand, '<-currentHand');
+        //console.log(currentHand, '<-currentHand');
         for(let card in currentHand) {
             //console.log(card);
             //console.log(cardsObj[currentHand[card]]);
             handArr[card] = cardsObj[currentHand[card]];
             //console.log(handArr);
-        }        
+        } 
+        standArr = [];    
         render();
         newGame = true;
     }  
-    //console.log(standArr, '<---standArr');  
+    //console.log(standArr, '<---standArr'); 
+    
 
 
 }
@@ -258,6 +267,11 @@ function standCard(num) {
     }
     //console.log(standArr, '<-- standArr');
 render();
+}
+
+function getHandValue() {
+    console.log(handArr);
+
 }
 
 
@@ -281,6 +295,8 @@ function render() {
         standButtonEls[+standButton].classList.remove(standArr.includes(+standButton) ? 'btn-danger' : 'btn-info');
         standButtonEls[+standButton].classList.add(standArr.includes(+standButton) ? 'btn-info' : 'btn-danger');    
     }
+    currentHandValueEl.innerText = 'Some value'; // update the hand value text with highest current winning hand
+
 }
 
 
