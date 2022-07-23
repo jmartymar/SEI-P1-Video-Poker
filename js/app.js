@@ -270,7 +270,55 @@ render();
 }
 
 function getHandValue() {
+    let suitMatches;
+    const suitsArr = [];
+    const valueArr = [];
+    for(idx in handArr) {    
+    //create arrays of suits and values from hand
+    suitsArr.push(handArr[idx].suit);        
+    valueArr.push(handArr[idx].value);
+
+    }
+    //console.log(suitsArr, '<-suitsArr');
+    // return an object of suit counts
+    suitMatches = suitsArr.reduce((acc, value) => {
+        acc[value] ? acc[value]++ : acc[value] = 1
+        return acc;
+    }, {});
+    // return an object of value counts
+    valueMatches = valueArr.reduce((acc, value) => {
+        acc[value] ? acc[value]++ : acc[value] = 1
+        return acc;
+    }, {});
+    //console.log(suitMatches, '<-suitMatches');
+    //console.log(suitMatches.some(arrVal => '2' === arrVal));
+    //if(Object.values(suitMatches).includes(2)) { console.log('got 2 suits')}
+    const suitMatchMax = Math.max(...Object.values(suitMatches));
+    const valueMatchMax = Math.max(...Object.values(valueMatches));
     console.log(handArr);
+    console.log(suitMatchMax, "<- suitMatches");
+    console.log(valueMatchMax, "<- valueMatches");
+//console.log(suitMatches, "<- suitMatches");
+//console.log(valueMatches, "<- valueMatches");
+
+    //
+
+// 0: {suit: 'spades', value: 'r03', imgUrl: 'css/card-deck-css/images/spades/spades-r03.svg'}
+// 1: {suit: 'clubs', value: 'r04', imgUrl: 'css/card-deck-css/images/clubs/clubs-r04.svg'}
+// 2: {suit: 'clubs', value: 'Q', imgUrl: 'css/card-deck-css/images/clubs/clubs-Q.svg'}
+// 3: {suit: 'spades', value: 'Q', imgUrl: 'css/card-deck-css/images/spades/spades-Q.svg'}
+// 4: {suit: 'spades', value: 'r07', imgUrl: 'css/card-deck-css/images/spades/spades-r07.svg'}
+
+
+
+    // 'Royal Flush' : {
+    //     suitMatches: 5,                     // how many cards must have matching suits
+    //     valueMatches: null,                 // how many cards must match a single or multiple values ie. [4] = 4 cards must all have the same value, [2,3] = 2 cards AND 3 other cards must match values
+    //     straightMatches: 5,                 // how many cards must be in a straight
+    //     areValueRange: '>== r10',           // if cards must be in a range, what is that range
+    //     areValueRangeMatches: 5,            // how many cards must match the areValueRange
+    //     baseWinValue: 250                   // winning hand value at 1 bet
+    // },
 
 }
 
