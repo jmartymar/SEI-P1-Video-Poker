@@ -6,11 +6,12 @@
 
 /*----- constants -----*/
 const cardSuits = ['clubs', 'diamonds', 'hearts', 'spades'];
-const cardValues = ['A', 'r02', 'r03', 'r04', 'r05', 'r06', 'r07', 'r08', 'r09', 'r10', 'J', 'Q', 'K', 'A'];
+const cardValues = ['r02', 'r03', 'r04', 'r05', 'r06', 'r07', 'r08', 'r09', 'r10', 'J', 'Q', 'K', 'A'];
 const cards = buildCardsObj(); // build the cards obj which returns both the cardsObj and deckArr initial state
 const cardsObj = cards[0]; // initialize cardsObj - list of all card atributes
 const fullDeckArr = cards[1]; // initialize fullDeckArr - list of all card names in a deck
 const winningHands = {
+
     'Royal Flush' : {
         suitMatches: 5,                     // how many cards must have matching suits
         valueMatches: null,                 // how many cards must match a single or multiple values ie. [4] = 4 cards must all have the same value, [2,3] = 2 cards AND 3 other cards must match values
@@ -122,6 +123,7 @@ const cardEls = {
     3: document.getElementById('card4'),
     4: document.getElementById('card5')
 }
+
 const standButtonEls = {
     0: document.getElementById('stand1'), 
     1: document.getElementById('stand2'),
@@ -180,8 +182,7 @@ function buildCardsObj() {
     for(let cardSuit of cardSuits) {
         //console.log(cardSuit, " cardsuite");
 
-        // ingore first instance of A in cardValues obj, it's there for A-5 straight but is highest value card otherwise
-        for(let cardValue of cardValues.slice(1)) {
+        for(let cardValue of cardValues) {
             cardFace = cardSuit + '-' + cardValue;
             cardsObj[cardFace] = {
                 //name: cardFace,
@@ -281,15 +282,15 @@ function getHandValue() {
     }
     //console.log(suitsArr, '<-suitsArr');
     // return an object of suit counts
-    suitMatches = suitsArr.reduce((acc, value) => {
-        acc[value] ? acc[value]++ : acc[value] = 1
-        return acc;
-    }, {});
+    // suitMatches = suitsArr.reduce((acc, value) => {
+    //     acc[value] ? acc[value]++ : acc[value] = 1
+    //     return acc;
+    // }, {});
     // return an object of value counts
-    valueMatches = valueArr.reduce((acc, value) => {
-        acc[value] ? acc[value]++ : acc[value] = 1
-        return acc;
-    }, {});
+    // valueMatches = valueArr.reduce((acc, value) => {
+    //     acc[value] ? acc[value]++ : acc[value] = 1
+    //     return acc;
+    // }, {});
     //console.log(suitMatches, '<-suitMatches');
     //console.log(suitMatches.some(arrVal => '2' === arrVal));
     //if(Object.values(suitMatches).includes(2)) { console.log('got 2 suits')}
@@ -303,14 +304,6 @@ function getHandValue() {
 
     //
 
-// 0: {suit: 'spades', value: 'r03', imgUrl: 'css/card-deck-css/images/spades/spades-r03.svg'}
-// 1: {suit: 'clubs', value: 'r04', imgUrl: 'css/card-deck-css/images/clubs/clubs-r04.svg'}
-// 2: {suit: 'clubs', value: 'Q', imgUrl: 'css/card-deck-css/images/clubs/clubs-Q.svg'}
-// 3: {suit: 'spades', value: 'Q', imgUrl: 'css/card-deck-css/images/spades/spades-Q.svg'}
-// 4: {suit: 'spades', value: 'r07', imgUrl: 'css/card-deck-css/images/spades/spades-r07.svg'}
-
-
-
     // 'Royal Flush' : {
     //     suitMatches: 5,                     // how many cards must have matching suits
     //     valueMatches: null,                 // how many cards must match a single or multiple values ie. [4] = 4 cards must all have the same value, [2,3] = 2 cards AND 3 other cards must match values
@@ -322,10 +315,9 @@ function getHandValue() {
 
 }
 
-
 function render() {
     //console.log(handArr);
-    for(let cardEl in cardEls) {
+    for(const cardEl in cardEls) {
         //console.log(cardEl, '<-- cardEl');
         //console.log(cardEls, '<-- cardEls');
         //console.log(handArr, '<--handArr');
@@ -334,7 +326,7 @@ function render() {
         //console.log(cardEls[cardEl].src);
         //console.log(handArr[cardEl], '<-- handArr');
     }
-    for(let standButton in standButtonEls) {
+    for(const standButton in standButtonEls) {
         //console.log(typeof standButton);
         //console.log(standArr, '<-standArr');
         //console.log(standArr.includes(+standButton), '<-stand button bool');
@@ -343,8 +335,194 @@ function render() {
         standButtonEls[+standButton].classList.remove(standArr.includes(+standButton) ? 'btn-danger' : 'btn-info');
         standButtonEls[+standButton].classList.add(standArr.includes(+standButton) ? 'btn-info' : 'btn-danger');    
     }
-    currentHandValueEl.innerText = 'Some value'; // update the hand value text with highest current winning hand
+    currentHandValueEl.innerText = newGame ? 'New Hand' : 'SomeValue'; // update the hand value text with highest current winning hand
 
+}
+
+function isStraight(handArr) {
+
+    let rankMin;
+    let rankMax;
+    //console.log(handArr);
+    // handArr = [
+    //     {suit: 'hearts', value: 'r07', imgUrl: 'css/card-deck-css/images/hearts/hearts-r07.svg'},
+    //     {suit: 'diamonds', value: 'r06', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-r06.svg'},
+    //     {suit: 'diamonds', value: 'r08', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-r08.svg'},
+    //     {suit: 'diamonds', value: 'r05', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-J.svg'},
+    //     {suit: 'hearts', value: 'r09', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-J.svg'}
+    // ]
+
+    //console.log(handArr,'<-handArr');
+    const cardRanksArr = getCardRanksArr(handArr);
+    console.log(cardRanksArr);
+    rankMin = Math.min(...cardRanksArr);   //get lowest card value
+    rankMax = Math.max(...cardRanksArr);    // get highest card value
+    //console.log(cardRanksArr,'<-cardRanksArr');
+    //console.log(rankMin, rankMax, '<-rankMin/Max');
+    //console.log(countDuplicates(cardRanksArr, '<-cardRanksArr'));
+    if(cardRanksArr.every(value => (value >= rankMin) && (value <= rankMax) && (countDuplicates(cardRanksArr) === 0) && (rankMax - rankMin === 4))) { // if highest and lowest are within 4, not duplicates, and within the min/max range then it's a straight
+        return true;
+    } else {
+        return false;
+    }
+        //TODO Need to account for Ace low straight
+    //console.log(rankMin, rankMax, '<---rankMin/RankMax');
+}
+
+function isFlush(handArr) {
+    // handArr = [
+    //     {suit: 'diamonds', value: 'r07', imgUrl: 'css/card-deck-css/images/hearts/hearts-r07.svg'},
+    //     {suit: 'diamonds', value: 'r06', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-r06.svg'},
+    //     {suit: 'diamonds', value: 'r08', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-r08.svg'},
+    //     {suit: 'diamonds', value: 'r05', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-J.svg'},
+    //     {suit: 'clubs', value: 'r10', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-J.svg'}
+    // ]
+    //console.log(handArr,'<-handArr');
+    const suitsArr = [];
+    let suitMatches;
+    for(const elem of handArr) {
+        //console.log(elem);
+        //console.log(handArr[elem], '<-handArr[elem]');
+        suitsArr.push(elem.suit);        // create array of suites
+    }
+    suitMatches = suitsArr.reduce((acc, value) => {  // reduce suits to get count of each suit
+        acc[value] ? acc[value]++ : acc[value] = 1
+        return acc;
+    }, {});
+
+    //console.log(suitMatches,'<-suitMatches');
+
+    if(Math.max(...Object.values(suitMatches)) === 5) { // check if any suits have a count of 5
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function isThreeOfKind(handArr) {
+    const valueArr = [];
+    for(const elem of handArr) {          
+        valueArr.push(elem.value);
+    }
+    valueMatches = valueArr.reduce((acc, value) => {
+        acc[value] ? acc[value]++ : acc[value] = 1
+        return acc;
+    }, {});
+    console.log(valueMatches,'<-valueMatches');
+    if(Object.values(valueMatches).some(value => value == 3)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function isPair(handArr) {
+    const valueArr = [];
+    for(const elem of handArr) {          
+        valueArr.push(elem.value);
+    }
+    valueMatches = valueArr.reduce((acc, value) => {
+        acc[value] ? acc[value]++ : acc[value] = 1
+        return acc;
+    }, {});
+    //console.log(valueMatches,'<-valueMatches');
+    if(Object.values(valueMatches).some(value => value == 2)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function isFourOfKind(handArr) {
+    const valueArr = [];
+    for(const elem of handArr) {          
+        valueArr.push(elem.value);
+    }
+    valueMatches = valueArr.reduce((acc, value) => {
+        acc[value] ? acc[value]++ : acc[value] = 1
+        return acc;
+    }, {});
+    //console.log(valueMatches,'<-valueMatches');
+    if(Object.values(valueMatches).some(value => value == 4)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function isTwoPair(handArr) {
+    const valueArr = [];
+    let pairs = 0;
+    for(const elem of handArr) {          
+        valueArr.push(elem.value);
+    }
+    valueMatches = valueArr.reduce((acc, value) => {
+        acc[value] ? acc[value]++ : acc[value] = 1
+        return acc;
+    }, {});
+
+    for(const key in valueMatches) {
+        if(valueMatches[key] === 2) {
+            pairs++
+        }        
+    }
+    if(pairs === 2) {
+        return true;
+    } else {
+        return false;
+    }  
+}
+
+function isFullHouse(handArr) {
+    if(isPair(handArr) && isThreeOfKind(handArr)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function countJackPlus(handArr) {
+    let jacksCount = 0;
+    handArr = [
+        {suit: 'diamonds', value: 'J', imgUrl: 'css/card-deck-css/images/hearts/hearts-r07.svg'},
+        {suit: 'diamonds', value: 'K', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-r06.svg'},
+        {suit: 'diamonds', value: 'A', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-r08.svg'},
+        {suit: 'diamonds', value: 'r05', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-J.svg'},
+        {suit: 'clubs', value: 'r10', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-J.svg'}
+    ]
+    const cardRanksArr = getCardRanksArr(handArr);
+    console.log(cardRanksArr);
+    for(const rank of cardRanksArr) {
+        if(rank >= 9) {
+            jacksCount++;
+        }
+    }
+    return jacksCount;
+}
+
+function countTenPlus(handArr) {
+
+}
+
+/*----- utility functions -----*/
+
+function getCardRanksArr(handArr) {
+    const cardRanksArr = [];
+    for(const elem of handArr) {
+        cardRanksArr.push(+Object.keys(cardValues).find(key => cardValues[key] === elem.value)); // compare card to card values array to determine rank
+    }
+    return cardRanksArr;
+}
+
+// stack overflow function to count duplicate values
+function countDuplicates(arr) {
+    const countsByItem = {};
+    for(const item of arr) {
+      countsByItem[item] = (countsByItem[item] || 0) + 1;
+    }
+    return Object.values(countsByItem)
+      .filter(val => val >= 2)
+      .length;
 }
 
 
