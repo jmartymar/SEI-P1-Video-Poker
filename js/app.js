@@ -188,7 +188,7 @@ function buildCardsObj() {
                 //name: cardFace,
                 suit: cardSuit,
                 value: cardValue,
-                imgUrl: 'css/card-deck-css/images/' + cardSuit + '/' + cardFace + '.svg'
+                imgUrl: 'images/' + cardSuit + '/' + cardFace + '.svg'
             }
             cardsArr.push(cardFace);
         i++;
@@ -345,11 +345,11 @@ function isStraight(handArr) {
     let rankMax;
     //console.log(handArr);
     // handArr = [
-    //     {suit: 'hearts', value: 'r07', imgUrl: 'css/card-deck-css/images/hearts/hearts-r07.svg'},
-    //     {suit: 'diamonds', value: 'r06', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-r06.svg'},
-    //     {suit: 'diamonds', value: 'r08', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-r08.svg'},
-    //     {suit: 'diamonds', value: 'r05', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-J.svg'},
-    //     {suit: 'hearts', value: 'r09', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-J.svg'}
+    //     {suit: 'hearts', value: 'r07', imgUrl: 'images/hearts/hearts-r07.svg'},
+    //     {suit: 'diamonds', value: 'r06', imgUrl: 'images/diamonds/diamonds-r06.svg'},
+    //     {suit: 'diamonds', value: 'r08', imgUrl: 'images/diamonds/diamonds-r08.svg'},
+    //     {suit: 'diamonds', value: 'r05', imgUrl: 'images/diamonds/diamonds-J.svg'},
+    //     {suit: 'hearts', value: 'r09', imgUrl: 'images/diamonds/diamonds-J.svg'}
     // ]
 
     //console.log(handArr,'<-handArr');
@@ -371,11 +371,11 @@ function isStraight(handArr) {
 
 function isFlush(handArr) {
     // handArr = [
-    //     {suit: 'diamonds', value: 'r07', imgUrl: 'css/card-deck-css/images/hearts/hearts-r07.svg'},
-    //     {suit: 'diamonds', value: 'r06', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-r06.svg'},
-    //     {suit: 'diamonds', value: 'r08', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-r08.svg'},
-    //     {suit: 'diamonds', value: 'r05', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-J.svg'},
-    //     {suit: 'clubs', value: 'r10', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-J.svg'}
+    //     {suit: 'diamonds', value: 'r07', imgUrl: 'images/hearts/hearts-r07.svg'},
+    //     {suit: 'diamonds', value: 'r06', imgUrl: 'images/diamonds/diamonds-r06.svg'},
+    //     {suit: 'diamonds', value: 'r08', imgUrl: 'images/diamonds/diamonds-r08.svg'},
+    //     {suit: 'diamonds', value: 'r05', imgUrl: 'images/diamonds/diamonds-J.svg'},
+    //     {suit: 'clubs', value: 'r10', imgUrl: 'images/diamonds/diamonds-J.svg'}
     // ]
     //console.log(handArr,'<-handArr');
     const suitsArr = [];
@@ -484,11 +484,11 @@ function isFullHouse(handArr) {
 function countJackPlus(handArr) {
     let jacksCount = 0;
     handArr = [
-        {suit: 'diamonds', value: 'J', imgUrl: 'css/card-deck-css/images/hearts/hearts-r07.svg'},
-        {suit: 'diamonds', value: 'K', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-r06.svg'},
-        {suit: 'diamonds', value: 'A', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-r08.svg'},
-        {suit: 'diamonds', value: 'r05', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-J.svg'},
-        {suit: 'clubs', value: 'r10', imgUrl: 'css/card-deck-css/images/diamonds/diamonds-J.svg'}
+        {suit: 'diamonds', value: 'J', imgUrl: 'images/hearts/hearts-r07.svg'},
+        {suit: 'diamonds', value: 'K', imgUrl: 'images/diamonds/diamonds-r06.svg'},
+        {suit: 'diamonds', value: 'A', imgUrl: 'images/diamonds/diamonds-r08.svg'},
+        {suit: 'diamonds', value: 'r05', imgUrl: 'images/diamonds/diamonds-J.svg'},
+        {suit: 'clubs', value: 'r10', imgUrl: 'images/diamonds/diamonds-J.svg'}
     ]
     const cardRanksArr = getCardRanksArr(handArr);
     console.log(cardRanksArr);
