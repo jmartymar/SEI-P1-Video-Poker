@@ -24,7 +24,6 @@ let drawArr = [];
 let newHand = false;
 let chipTotal = 100;
 let betAmount = 0;
-//let winningHand = ['New Hand'];
 
 /*----- cached element references -----*/
 const cardEls = {
@@ -76,14 +75,11 @@ init();
 
 /*----- functions -----*/
 function init() {
-    //console.log(newGame);
-    //handArr = [];
     if(newHand) { 
         deckArr = [...fullDeckArr];
         standArr = [];
         drawArr = [];
         currentHand = [];
-        //betAmount = 0;
     } else {
         render();
     }
@@ -97,12 +93,10 @@ function buildCardsObj() {
     const cardsObj = {};
     var cardsArr = [];
     for(let cardSuit of cardSuits) {
-        //console.log(cardSuit, " cardsuite");
 
         for(let cardValue of cardValues) {
             cardFace = cardSuit + '-' + cardValue;
             cardsObj[cardFace] = {
-                //name: cardFace,
                 suit: cardSuit,
                 value: cardValue,
                 imgUrl: 'images/' + cardSuit + '/' + cardFace + '.svg'
@@ -116,25 +110,18 @@ function buildCardsObj() {
 
 function pickRandomCard(arr) {
     let rand = Math.floor(Math.random()*arr.length);
-    //console.log(rand);
-    //let randomCard = deckArr.slice(rand,rand+1);
     let randomCard = arr.splice(rand,1);
-    //console.log(randomCard);
     return randomCard; 
 }
 
 function buildHand(deckArr, cardsWantedArr = [0, 1, 2, 3, 4]) {
-    //let hand = [];
     for(i = 0; i <= 4; i++) {
         if(cardsWantedArr.includes(i)) {
-            //console.log('true');
             currentHand[i] = pickRandomCard(deckArr);
         } else {
-            //console.log(cardsWantedArr[i], 'false');
             currentHand[i] = currentHand[i];
         }
     }
-    //console.log(currentHand, '<-currentHand')
 return currentHand;
 }
 
@@ -149,7 +136,6 @@ function playHand() {
     }
     if(chipTotal <= 0) {
         promptAddFunds(); // prompt user to add funds if playHand is invoked with <= chipTotal
-        render;
         return;
     }
     
@@ -158,96 +144,96 @@ function playHand() {
         init();
         currentHand = buildHand(deckArr);
         for(let card in currentHand) {
-            //console.log(card);
-            //console.log(cardsObj[currentHand[card]]);
             handArr[card] = cardsObj[currentHand[card]];
-            //console.log(handArr);
         }
-        render();
-        //newGame = false;
     } else {
         for(i = 0; i <= 4; i++) {
             
             if(!standArr.includes(i)) { drawArr.push(i) }
-            // console.log(drawArr, "<- drawArr");
-            // console.log(standArr[i], "<- standCardInd");
         }
         currentHand = buildHand(deckArr, drawArr);
-        //console.log(currentHand, '<-currentHand');
         for(let card in currentHand) {
-            //console.log(card);
-            //console.log(cardsObj[currentHand[card]]);
             handArr[card] = cardsObj[currentHand[card]];
-            //console.log(handArr);
         } 
-        //console.log(getWinningHand(handArr),'<--getWinningHand(handArr)');
         if(getWinningHand(handArr)) {
             chipTotal += (getWinningHand(handArr)[1] * betAmount);
         }
         chipTotal -= betAmount;
         standArr = [];    
-        render();
-        //newGame = true;
     }
+    render();
 }
 
 function addBet() {
     if(betAmount < 5) {
         betAmount += 1;
-        //chipTotal -= 1;
     }
     render();
 }
 function minusBet() {
     if(betAmount > 0) {
         betAmount -= 1;
-        //chipTotal -= 1;
     }
     render();
 }
 function addMaxBet() {
     if(betAmount < 5) {
         betAmount += (5 - betAmount);
-        //chipTotal -= (5 - betAmount);
     }
     render();
 }
 
 function standCard(num) {
-    if(standArr.includes(num)) {
-        standArr = standArr.filter(value => value != num);
-    } else {
-        standArr.push(num);
+    if(newHand) {
+        if(standArr.includes(num)) {
+            standArr = standArr.filter(value => value != num);
+        } else {
+            standArr.push(num);
+        }
     }
-    //console.log(standArr, '<-- standArr');
 render();
 }
 
 function render() {
     //update card images
     const winningHand = getWinningHand(handArr);
+    let betClass;
     if(!newGame) {
         for(const cardEl in cardEls) {
             cardEls[cardEl].querySelector('img').src = handArr[cardEl].imgUrl;
         }
-    //update stand card html
-        for(const standButton in standButtonEls) {
-            cardEls[+standButton].querySelector('img').style.border = standArr.includes(+standButton) ? '2px solid red' : 'none';
-            standButtonEls[+standButton].classList.remove(standArr.includes(+standButton) ? 'btn-danger' : 'btn-info');
-            standButtonEls[+standButton].classList.add(standArr.includes(+standButton) ? 'btn-info' : 'btn-danger');    
-        }
+        //update stand card html
+            for(const standButton in standButtonEls) {
+                if(newHand) {
+                    cardEls[+standButton].querySelector('img').style.border = standArr.includes(+standButton) ? '2px solid red' : 'none';
+                    standButtonEls[+standButton].classList.remove(standArr.includes(+standButton) ? 'btn-danger' : 'btn-info');
+                    standButtonEls[+standButton].classList.add(standArr.includes(+standButton) ? 'btn-info' : 'btn-danger');    
+                    standButtonEls[+standButton].disabled = false;    
+                } else {
+                    standButtonEls[+standButton].disabled = true;
+
+                }
+            }
         //update current/winning hand text 
         currentHandValueEl.querySelector('h1').innerText = winningHand ? winningHand[0] : 'Nothing'; // update the hand value text with highest current winning hand
-        console.log(winningHand,'<-winningHand');
+        document.querySelectorAll('.bet-row').forEach(function(el) { // reset all bet rows
+            el.classList.remove('bg-danger');           
+        })
         if(winningHand) {
             let handId =  winningHand[0].toLowerCase().split(" ").join('-');
-            document.getElementById(handId).classList.remove('bg-primary');
             document.getElementById(handId).classList.add('bg-danger');
-        } else {
-            document.querySelectorAll('.bet-row').forEach(function(el) { 
-                el.classList.remove('bg-danger');
-                el.classList.add('bg-primary');            
+        }
+        for(i = 1; i <= 5; i++) {
+            betClass = '.bet-' + i;
+            console.log(document.querySelectorAll(betClass),'<-betclass row');
+            document.querySelectorAll(betClass).forEach(function(el) { // reset all bet columns
+                el.classList.remove('bg-danger');          
             })
+            if(i === betAmount) {
+                document.querySelectorAll(betClass).forEach(function(el) { // update current bet column
+                    el.classList.add('bg-danger');            
+                })
+            }
         }
 
     }
@@ -263,46 +249,22 @@ function isStraight(handArr) {
 
     let rankMin;
     let rankMax;
-    //console.log(handArr);
-    // handArr = [
-    //     {suit: 'hearts', value: 'r07', imgUrl: 'images/hearts/hearts-r07.svg'},
-    //     {suit: 'diamonds', value: 'r06', imgUrl: 'images/diamonds/diamonds-r06.svg'},
-    //     {suit: 'diamonds', value: 'r08', imgUrl: 'images/diamonds/diamonds-r08.svg'},
-    //     {suit: 'diamonds', value: 'r05', imgUrl: 'images/diamonds/diamonds-J.svg'},
-    //     {suit: 'hearts', value: 'r09', imgUrl: 'images/diamonds/diamonds-J.svg'}
-    // ]
 
-    //console.log(handArr,'<-handArr');
     const cardRanksArr = getCardRanksArr(handArr);
-    //console.log(cardRanksArr);
     rankMin = Math.min(...cardRanksArr);   //get lowest card value
     rankMax = Math.max(...cardRanksArr);    // get highest card value
-    //console.log(cardRanksArr,'<-cardRanksArr');
-    //console.log(rankMin, rankMax, '<-rankMin/Max');
-    //console.log(countDuplicates(cardRanksArr, '<-cardRanksArr'));
     if(cardRanksArr.every(value => (value >= rankMin) && (value <= rankMax) && (countDuplicates(cardRanksArr) === 0) && (rankMax - rankMin === 4) && handArr.length > 0)) { // if highest and lowest are within 4, not duplicates, and within the min/max range then it's a straight
         return true;
     } else {
         return false;
     }
         //TODO Need to account for Ace low straight
-    //console.log(rankMin, rankMax, '<---rankMin/RankMax');
 }
 
 function isFlush(handArr) {
-    // handArr = [
-    //     {suit: 'diamonds', value: 'r07', imgUrl: 'images/hearts/hearts-r07.svg'},
-    //     {suit: 'diamonds', value: 'r06', imgUrl: 'images/diamonds/diamonds-r06.svg'},
-    //     {suit: 'diamonds', value: 'r08', imgUrl: 'images/diamonds/diamonds-r08.svg'},
-    //     {suit: 'diamonds', value: 'r05', imgUrl: 'images/diamonds/diamonds-J.svg'},
-    //     {suit: 'clubs', value: 'r10', imgUrl: 'images/diamonds/diamonds-J.svg'}
-    // ]
-    //console.log(handArr,'<-handArr');
     const suitsArr = [];
     let suitMatches;
     for(const elem of handArr) {
-        //console.log(elem);
-        //console.log(handArr[elem], '<-handArr[elem]');
         suitsArr.push(elem.suit);        // create array of suites
     }
     suitMatches = suitsArr.reduce((acc, value) => {  // reduce suits to get count of each suit
@@ -310,7 +272,6 @@ function isFlush(handArr) {
         return acc;
     }, {});
 
-    //console.log(suitMatches,'<-suitMatches');
 
     if(Math.max(...Object.values(suitMatches)) === 5) { // check if any suits have a count of 5
         return true;
@@ -329,7 +290,6 @@ function isThreeOfKind(handArr) {
         acc[value] ? acc[value]++ : acc[value] = 1
         return acc;
     }, {});
-    //console.log(valueMatches,'<-valueMatches');
     if(Object.values(valueMatches).some(value => value == 3)) {
         return true;
     } else {
@@ -347,7 +307,6 @@ function isPair(handArr) {
         acc[value] ? acc[value]++ : acc[value] = 1
         return acc;
     }, {});
-    //console.log(valueMatches,'<-valueMatches');
     if(Object.values(valueMatches).some(value => value == 2)) {
         return true;
     } else {
@@ -365,7 +324,6 @@ function isFourOfKind(handArr) {
         acc[value] ? acc[value]++ : acc[value] = 1
         return acc;
     }, {});
-    //console.log(valueMatches,'<-valueMatches');
     if(Object.values(valueMatches).some(value => value == 4)) {
         return true;
     } else {
@@ -456,13 +414,6 @@ function isFourAces(handArr) {
 }
 
 function getWinningHand(handArr) {
-    // handArr = [
-    //     {suit: 'diamonds', value: 'A', imgUrl: 'images/hearts/hearts-r07.svg'},
-    //     {suit: 'diamonds', value: 'A', imgUrl: 'images/diamonds/diamonds-r06.svg'},
-    //     {suit: 'clubs', value: 'r04', imgUrl: 'images/diamonds/diamonds-r08.svg'},
-    //     {suit: 'diamonds', value: 'A', imgUrl: 'images/diamonds/diamonds-J.svg'},
-    //     {suit: 'diamonds', value: 'r10', imgUrl: 'images/diamonds/diamonds-J.svg'}
-    // ]
     const winningHands = {
         'Royal Flush' : {
             value: 250,
@@ -539,7 +490,6 @@ function getWinningHand(handArr) {
     }
     // itterate through winning hands, return first hand with all true values else return false
     for(const hand in winningHands) {
-        //console.log(hand,'<-hand');
         if(Object.values(winningHands[hand].rules).every(value => value === true)) { 
             return [hand,winningHands[hand].value];
         }
