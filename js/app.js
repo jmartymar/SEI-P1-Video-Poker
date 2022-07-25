@@ -22,7 +22,8 @@ let newGame = true;
 let currentHand = [];
 let drawArr = [];
 let newHand = false;
-let chipTotal = 0;
+let chipTotal = 100;
+let betAmount = 0;
 //let winningHand = ['New Hand'];
 
 /*----- cached element references -----*/
@@ -64,7 +65,12 @@ cardEls[4].addEventListener('click', function(){standCard(4)});
 
 document.getElementById('deal-button').addEventListener('click', playHand);
 
+document.getElementById('bet-add').addEventListener('click', addBet);
+document.getElementById('bet-minus').addEventListener('click', minusBet);
+document.getElementById('bet-max').addEventListener('click', addMaxBet);
 
+// TODO need to add new game state between each hand which stores the bet for the next hand. Do not allow bet unless in prehand state
+// states: new game, betting, drawing, showdown
 
 init();
 
@@ -72,11 +78,12 @@ init();
 function init() {
     //console.log(newGame);
     //handArr = [];
-    if(newGame || newHand) { 
+    if(newHand) { 
         deckArr = [...fullDeckArr];
         standArr = [];
         drawArr = [];
         currentHand = [];
+        //betAmount = 0;
     } else {
         render();
     }
@@ -132,10 +139,18 @@ return currentHand;
 }
 
 function playHand() {
+    if(newGame) { 
+        newGame = false; 
+    }
     if(newHand) {
         newHand = false;
     } else {
         newHand = true;
+    }
+    if(chipTotal <= 0) {
+        promptAddFunds(); // prompt user to add funds if playHand is invoked with <= chipTotal
+        render;
+        return;
     }
     
     // if new game, build full hand, else update hand
@@ -167,12 +182,35 @@ function playHand() {
         } 
         //console.log(getWinningHand(handArr),'<--getWinningHand(handArr)');
         if(getWinningHand(handArr)) {
-            chipTotal += getWinningHand(handArr)[1];
+            chipTotal += (getWinningHand(handArr)[1] * betAmount);
         }
+        chipTotal -= betAmount;
         standArr = [];    
         render();
         //newGame = true;
     }
+}
+
+function addBet() {
+    if(betAmount < 5) {
+        betAmount += 1;
+        //chipTotal -= 1;
+    }
+    render();
+}
+function minusBet() {
+    if(betAmount > 0) {
+        betAmount -= 1;
+        //chipTotal -= 1;
+    }
+    render();
+}
+function addMaxBet() {
+    if(betAmount < 5) {
+        betAmount += (5 - betAmount);
+        //chipTotal -= (5 - betAmount);
+    }
+    render();
 }
 
 function standCard(num) {
@@ -187,23 +225,35 @@ render();
 
 function render() {
     //update card images
-    for(const cardEl in cardEls) {
-        cardEls[cardEl].querySelector('img').src = handArr[cardEl].imgUrl;
-    }
+    const winningHand = getWinningHand(handArr);
+    if(!newGame) {
+        for(const cardEl in cardEls) {
+            cardEls[cardEl].querySelector('img').src = handArr[cardEl].imgUrl;
+        }
     //update stand card html
-    for(const standButton in standButtonEls) {
-        cardEls[+standButton].querySelector('img').style.border = standArr.includes(+standButton) ? '2px solid red' : 'none';
-        standButtonEls[+standButton].classList.remove(standArr.includes(+standButton) ? 'btn-danger' : 'btn-info');
-        standButtonEls[+standButton].classList.add(standArr.includes(+standButton) ? 'btn-info' : 'btn-danger');    
+        for(const standButton in standButtonEls) {
+            cardEls[+standButton].querySelector('img').style.border = standArr.includes(+standButton) ? '2px solid red' : 'none';
+            standButtonEls[+standButton].classList.remove(standArr.includes(+standButton) ? 'btn-danger' : 'btn-info');
+            standButtonEls[+standButton].classList.add(standArr.includes(+standButton) ? 'btn-info' : 'btn-danger');    
+        }
+        //update current/winning hand text 
+        currentHandValueEl.querySelector('h1').innerText = winningHand ? winningHand[0] : 'Nothing'; // update the hand value text with highest current winning hand
+        console.log(winningHand,'<-winningHand');
+        if(winningHand) {
+            let handId =  winningHand[0].toLowerCase().split(" ").join('-');
+            document.getElementById(handId).classList.remove('bg-primary');
+            document.getElementById(handId).classList.add('bg-danger');
+        } else {
+            document.querySelectorAll('.bet-row').forEach(function(el) { 
+                el.classList.remove('bg-danger');
+                el.classList.add('bg-primary');            
+            })
+        }
+
     }
-    //update current/winning hand text 
-    currentHandValueEl.querySelector('h1').innerText = getWinningHand(handArr)[0]; // update the hand value text with highest current winning hand
-    if(newHand) {
-        currentHandValueEl.classList.remove('bg-primary');
-    } else {
-        currentHandValueEl.classList.add('bg-primary');
-        chipTotalEl.innerText = chipTotal;
-    }
+    newHand && !newGame ? currentHandValueEl.classList.remove('bg-primary') : currentHandValueEl.classList.add('bg-primary');
+    chipTotalEl.innerText = chipTotal;
+    document.getElementById('current-bet').innerText = 'Current bet: ' + betAmount;
 
 }
 
