@@ -10,99 +10,7 @@ const cardValues = ['r02', 'r03', 'r04', 'r05', 'r06', 'r07', 'r08', 'r09', 'r10
 const cards = buildCardsObj(); // build the cards obj which returns both the cardsObj and deckArr initial state
 const cardsObj = cards[0]; // initialize cardsObj - list of all card atributes
 const fullDeckArr = cards[1]; // initialize fullDeckArr - list of all card names in a deck
-const winningHands = {
 
-    'Royal Flush' : {
-        suitMatches: 5,                     // how many cards must have matching suits
-        valueMatches: null,                 // how many cards must match a single or multiple values ie. [4] = 4 cards must all have the same value, [2,3] = 2 cards AND 3 other cards must match values
-        straightMatches: 5,                 // how many cards must be in a straight
-        areValueRange: '>== r10',           // if cards must be in a range, what is that range
-        areValueRangeMatches: 5,            // how many cards must match the areValueRange
-        baseWinValue: 250                   // winning hand value at 1 bet
-    },
-    'Four Aces': {
-        suitMatches: null,
-        valueMatches: [4],
-        straightMatches: null,
-        areRoyal: null,
-        areValueRange: '=== A',
-        areValueRangeMatches: 4,
-        baseWinValue: 160
-    },
-    'Four Jacks thru Kings': {
-        suitMatches: null,
-        valueMatches: [4],
-        straightMatches: null,
-        areValueRange: '>== J',
-        areValueRangeMatches: 4,
-        baseWinValue: 80
-    },
-    'Straight Flush': {
-        suitMatches: 5,
-        valueMatches: null,
-        straightMatches: 5,
-        areRoyal: null,
-        areValueRange: '<== r10',
-        areValueRangeMatches: 4,
-        baseWinValue: 50
-    },
-    '4 2s thru 10s': {
-        suitMatches: null,
-        valueMatches: [4],
-        straightMatches: null,
-        areValueRange: '>== r2 && <== r10',
-        areValueRangeMatches: 4,
-        baseWinValue: 50
-    },
-    'Full House': {
-        suitMatches: null,
-        valueMatches: [2,3],
-        straightMatches: null,
-        areValueRange: null,
-        areValueRangeMatches: null,
-        baseWinValue: 9
-    },
-    'Flush': {
-        suitMatches: 5,
-        valueMatches: null,
-        straightMatches: null,
-        areValueRange: null,
-        areValueRangeMatches: null,
-        baseWinValue: 5
-    },
-    'Straight': {
-        suitMatches: null,
-        valueMatches: null,
-        straightMatches: 5,
-        areValueRange: null,
-        areValueRangeMatches: null,
-        baseWinValue: 4
-    },
-    '3 of a Kind': {
-        suitMatches: null,
-        valueMatches: [3],
-        straightMatches: null,
-        areValueRange: null,
-        areValueRangeMatches: null,
-        baseWinValue: 3
-    },
-    'Two Pair': {
-        suitMatches: null,
-        valueMatches: [2,2],
-        straightMatches: null,
-        areValueRange: null,
-        areValueRangeMatches: null,
-        baseWinValue: 1
-    },
-    'Jacks or Better': {
-        suitMatches: null,
-        valueMatches: [2],
-        straightMatches: null,
-        areValueRange:  '>== J',
-        areValueRangeMatches: 2,
-        baseWinValue: 1
-    }
-}
 
 /*----- app's state (variables) -----*/
 
@@ -113,7 +21,6 @@ let standArr = [];
 let newGame = true;
 let currentHand = [];
 let drawArr = [];
-
 
 /*----- cached element references -----*/
 const cardEls = {
@@ -270,51 +177,6 @@ function standCard(num) {
 render();
 }
 
-function getHandValue() {
-    let suitMatches;
-    const suitsArr = [];
-    const valueArr = [];
-    for(idx in handArr) {    
-    //create arrays of suits and values from hand
-    suitsArr.push(handArr[idx].suit);        
-    valueArr.push(handArr[idx].value);
-
-    }
-    //console.log(suitsArr, '<-suitsArr');
-    // return an object of suit counts
-    // suitMatches = suitsArr.reduce((acc, value) => {
-    //     acc[value] ? acc[value]++ : acc[value] = 1
-    //     return acc;
-    // }, {});
-    // return an object of value counts
-    // valueMatches = valueArr.reduce((acc, value) => {
-    //     acc[value] ? acc[value]++ : acc[value] = 1
-    //     return acc;
-    // }, {});
-    //console.log(suitMatches, '<-suitMatches');
-    //console.log(suitMatches.some(arrVal => '2' === arrVal));
-    //if(Object.values(suitMatches).includes(2)) { console.log('got 2 suits')}
-    const suitMatchMax = Math.max(...Object.values(suitMatches));
-    const valueMatchMax = Math.max(...Object.values(valueMatches));
-    console.log(handArr);
-    console.log(suitMatchMax, "<- suitMatches");
-    console.log(valueMatchMax, "<- valueMatches");
-//console.log(suitMatches, "<- suitMatches");
-//console.log(valueMatches, "<- valueMatches");
-
-    //
-
-    // 'Royal Flush' : {
-    //     suitMatches: 5,                     // how many cards must have matching suits
-    //     valueMatches: null,                 // how many cards must match a single or multiple values ie. [4] = 4 cards must all have the same value, [2,3] = 2 cards AND 3 other cards must match values
-    //     straightMatches: 5,                 // how many cards must be in a straight
-    //     areValueRange: '>== r10',           // if cards must be in a range, what is that range
-    //     areValueRangeMatches: 5,            // how many cards must match the areValueRange
-    //     baseWinValue: 250                   // winning hand value at 1 bet
-    // },
-
-}
-
 function render() {
     //console.log(handArr);
     for(const cardEl in cardEls) {
@@ -335,7 +197,7 @@ function render() {
         standButtonEls[+standButton].classList.remove(standArr.includes(+standButton) ? 'btn-danger' : 'btn-info');
         standButtonEls[+standButton].classList.add(standArr.includes(+standButton) ? 'btn-info' : 'btn-danger');    
     }
-    currentHandValueEl.innerText = newGame ? 'New Hand' : 'SomeValue'; // update the hand value text with highest current winning hand
+    currentHandValueEl.innerText = getWinningHand(handArr); // update the hand value text with highest current winning hand
 
 }
 
@@ -354,13 +216,13 @@ function isStraight(handArr) {
 
     //console.log(handArr,'<-handArr');
     const cardRanksArr = getCardRanksArr(handArr);
-    console.log(cardRanksArr);
+    //console.log(cardRanksArr);
     rankMin = Math.min(...cardRanksArr);   //get lowest card value
     rankMax = Math.max(...cardRanksArr);    // get highest card value
     //console.log(cardRanksArr,'<-cardRanksArr');
     //console.log(rankMin, rankMax, '<-rankMin/Max');
     //console.log(countDuplicates(cardRanksArr, '<-cardRanksArr'));
-    if(cardRanksArr.every(value => (value >= rankMin) && (value <= rankMax) && (countDuplicates(cardRanksArr) === 0) && (rankMax - rankMin === 4))) { // if highest and lowest are within 4, not duplicates, and within the min/max range then it's a straight
+    if(cardRanksArr.every(value => (value >= rankMin) && (value <= rankMax) && (countDuplicates(cardRanksArr) === 0) && (rankMax - rankMin === 4) && handArr.length > 0)) { // if highest and lowest are within 4, not duplicates, and within the min/max range then it's a straight
         return true;
     } else {
         return false;
@@ -401,6 +263,7 @@ function isFlush(handArr) {
 
 function isThreeOfKind(handArr) {
     const valueArr = [];
+    let valueMatches;
     for(const elem of handArr) {          
         valueArr.push(elem.value);
     }
@@ -418,6 +281,7 @@ function isThreeOfKind(handArr) {
 
 function isPair(handArr) {
     const valueArr = [];
+    let valueMatches;
     for(const elem of handArr) {          
         valueArr.push(elem.value);
     }
@@ -435,6 +299,7 @@ function isPair(handArr) {
 
 function isFourOfKind(handArr) {
     const valueArr = [];
+    let valueMatches;
     for(const elem of handArr) {          
         valueArr.push(elem.value);
     }
@@ -452,6 +317,7 @@ function isFourOfKind(handArr) {
 
 function isTwoPair(handArr) {
     const valueArr = [];
+    let valueMatches;
     let pairs = 0;
     for(const elem of handArr) {          
         valueArr.push(elem.value);
@@ -473,25 +339,10 @@ function isTwoPair(handArr) {
     }  
 }
 
-function isFullHouse(handArr) {
-    if(isPair(handArr) && isThreeOfKind(handArr)) {
-        return true;
-    } else {
-        return false;
-    }
-}
 
 function countJackPlus(handArr) {
     let jacksCount = 0;
-    handArr = [
-        {suit: 'diamonds', value: 'J', imgUrl: 'images/hearts/hearts-r07.svg'},
-        {suit: 'diamonds', value: 'K', imgUrl: 'images/diamonds/diamonds-r06.svg'},
-        {suit: 'diamonds', value: 'A', imgUrl: 'images/diamonds/diamonds-r08.svg'},
-        {suit: 'diamonds', value: 'r05', imgUrl: 'images/diamonds/diamonds-J.svg'},
-        {suit: 'clubs', value: 'r10', imgUrl: 'images/diamonds/diamonds-J.svg'}
-    ]
     const cardRanksArr = getCardRanksArr(handArr);
-    console.log(cardRanksArr);
     for(const rank of cardRanksArr) {
         if(rank >= 9) {
             jacksCount++;
@@ -501,7 +352,141 @@ function countJackPlus(handArr) {
 }
 
 function countTenPlus(handArr) {
+    let tensCount = 0;
+    const cardRanksArr = getCardRanksArr(handArr);
+    for(const rank of cardRanksArr) {
+        if(rank >= 8) {
+            tensCount++;
+        }
+    }
+    return tensCount;
+}
 
+function isPairJacksPlus(handArr) {
+    const valueArr = [];
+    let valueMatches;
+    const cardRanksArr = getCardRanksArr(handArr);
+    for(const elem of handArr) {          
+        valueArr.push(elem.value);
+    }
+    valueMatches = valueArr.reduce((acc, value) => {
+        acc[value] ? acc[value]++ : acc[value] = 1
+        return acc;
+    }, {});
+
+    for(const elem in valueMatches) {
+        if(+Object.keys(cardValues).find(key => cardValues[key] === elem) >= 9 && valueMatches[elem] == 2) {
+            return true;
+        }
+    } 
+    return false;    
+}
+
+function isFourAces(handArr) {
+    let acesCount = 0;
+    const cardRanksArr = getCardRanksArr(handArr);
+    for(const rank of cardRanksArr) {
+        if(rank === 12) {
+            acesCount++;
+        }
+    }
+    if(acesCount === 4) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function getWinningHand(handArr) {
+    // handArr = [
+    //     {suit: 'diamonds', value: 'A', imgUrl: 'images/hearts/hearts-r07.svg'},
+    //     {suit: 'diamonds', value: 'A', imgUrl: 'images/diamonds/diamonds-r06.svg'},
+    //     {suit: 'clubs', value: 'r04', imgUrl: 'images/diamonds/diamonds-r08.svg'},
+    //     {suit: 'diamonds', value: 'A', imgUrl: 'images/diamonds/diamonds-J.svg'},
+    //     {suit: 'diamonds', value: 'r10', imgUrl: 'images/diamonds/diamonds-J.svg'}
+    // ]
+    const winningHands = {
+        'Royal Flush' : {
+            value: 250,
+            rules: {
+                isFlush: isFlush(handArr),                    
+                isStraight: isStraight(handArr),                 
+                countTenPlus: countTenPlus(handArr) === 5                
+            }
+        },
+        'Four Aces': {
+            value: 160,
+            rules: {
+                isFourAces: isFourAces(handArr)
+            }
+        },
+        'Four Jacks thru Kings': {
+            value: 80,
+            rules: {
+                isFourOfKind: isFourOfKind(handArr),
+                countJackPlus: countJackPlus(handArr) >= 4
+            }
+        },
+        'Straight Flush': {
+            value: 50,
+            rules: {
+                isStraight: isStraight(handArr),
+                isFlush: isFlush(handArr)
+            }
+        },
+        '4 2s thru 10s': {
+            value: 50,
+            rules: {
+                countJackPlus: countJackPlus(handArr) <= 1,
+                isFourOfKind: isFourOfKind(handArr)
+            }
+        },
+        'Full House': {
+            value: 9,
+            rules: {
+                isPair: isPair(handArr),
+                isThreeOfKind: isThreeOfKind(handArr)
+            }
+        },
+        'Flush': {
+            value: 5,
+            rules: {
+                isFlush: isFlush(handArr)
+            }
+        },
+        'Straight': {
+            value: 4,
+            rules: {
+                isStraight: isStraight(handArr)
+            }
+        },
+        '3 of a Kind': {
+            value: 3,
+            rules: {
+                isThreeOfKind: isThreeOfKind(handArr)
+            }
+        },
+        'Two Pair': {
+            value: 1,
+            rules: {
+                isTwoPair: isTwoPair(handArr)
+            }
+        },
+        'Jacks or Better': {
+            value: 1,
+            rules: {
+                isPairJacksPlus: isPairJacksPlus(handArr)
+            }
+        }
+    }
+    // itterate through winning hands, return first hand with all true values else return false
+    for(const hand in winningHands) {
+        console.log(hand,'<-hand');
+        if(Object.values(winningHands[hand].rules).every(value => value === true)) { 
+            return hand;
+        }
+    }
+    return false;
 }
 
 /*----- utility functions -----*/
