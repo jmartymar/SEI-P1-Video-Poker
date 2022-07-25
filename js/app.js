@@ -21,6 +21,9 @@ let standArr = [];
 let newGame = true;
 let currentHand = [];
 let drawArr = [];
+let newHand = false;
+let chipTotal = 0;
+//let winningHand = ['New Hand'];
 
 /*----- cached element references -----*/
 const cardEls = {
@@ -39,7 +42,7 @@ const standButtonEls = {
     4: document.getElementById('stand5')
 }
 
-const chipTotalEl = document.getElementById('chipTotal');
+const chipTotalEl = document.getElementById('chip-total');
 const chipPileEl = document.getElementById('chip-pile');
 const currentBetEl = document.getElementById('current-bet');
 const currentHandValueEl = document.getElementById('hand-value');
@@ -69,7 +72,7 @@ init();
 function init() {
     //console.log(newGame);
     //handArr = [];
-    if(newGame) { 
+    if(newGame || newHand) { 
         deckArr = [...fullDeckArr];
         standArr = [];
         drawArr = [];
@@ -129,9 +132,14 @@ return currentHand;
 }
 
 function playHand() {
+    if(newHand) {
+        newHand = false;
+    } else {
+        newHand = true;
+    }
     
     // if new game, build full hand, else update hand
-    if(newGame) {
+    if(newHand) {
         init();
         currentHand = buildHand(deckArr);
         for(let card in currentHand) {
@@ -141,7 +149,7 @@ function playHand() {
             //console.log(handArr);
         }
         render();
-        newGame = false;
+        //newGame = false;
     } else {
         for(i = 0; i <= 4; i++) {
             
@@ -157,14 +165,14 @@ function playHand() {
             handArr[card] = cardsObj[currentHand[card]];
             //console.log(handArr);
         } 
+        //console.log(getWinningHand(handArr),'<--getWinningHand(handArr)');
+        if(getWinningHand(handArr)) {
+            chipTotal += getWinningHand(handArr)[1];
+        }
         standArr = [];    
         render();
-        newGame = true;
-    }  
-    //console.log(standArr, '<---standArr'); 
-    
-
-
+        //newGame = true;
+    }
 }
 
 function standCard(num) {
@@ -178,29 +186,29 @@ render();
 }
 
 function render() {
-    //console.log(handArr);
+    //update card images
     for(const cardEl in cardEls) {
-        //console.log(cardEl, '<-- cardEl');
-        //console.log(cardEls, '<-- cardEls');
-        //console.log(handArr, '<--handArr');
-        //console.log(handArr[cardEl], '<-- handArr[cardEl]');
         cardEls[cardEl].querySelector('img').src = handArr[cardEl].imgUrl;
-        //console.log(cardEls[cardEl].src);
-        //console.log(handArr[cardEl], '<-- handArr');
     }
+    //update stand card html
     for(const standButton in standButtonEls) {
-        //console.log(typeof standButton);
-        //console.log(standArr, '<-standArr');
-        //console.log(standArr.includes(+standButton), '<-stand button bool');
-        //console.log(standButton, '<<-stand button')
         cardEls[+standButton].querySelector('img').style.border = standArr.includes(+standButton) ? '2px solid red' : 'none';
         standButtonEls[+standButton].classList.remove(standArr.includes(+standButton) ? 'btn-danger' : 'btn-info');
         standButtonEls[+standButton].classList.add(standArr.includes(+standButton) ? 'btn-info' : 'btn-danger');    
     }
-    currentHandValueEl.innerText = getWinningHand(handArr); // update the hand value text with highest current winning hand
+    //update current/winning hand text 
+    currentHandValueEl.querySelector('h1').innerText = getWinningHand(handArr)[0]; // update the hand value text with highest current winning hand
+    if(newHand) {
+        currentHandValueEl.classList.remove('bg-primary');
+    } else {
+        currentHandValueEl.classList.add('bg-primary');
+        chipTotalEl.innerText = chipTotal;
+    }
 
 }
 
+
+/*----- hand test functions -----*/
 function isStraight(handArr) {
 
     let rankMin;
@@ -271,7 +279,7 @@ function isThreeOfKind(handArr) {
         acc[value] ? acc[value]++ : acc[value] = 1
         return acc;
     }, {});
-    console.log(valueMatches,'<-valueMatches');
+    //console.log(valueMatches,'<-valueMatches');
     if(Object.values(valueMatches).some(value => value == 3)) {
         return true;
     } else {
@@ -481,9 +489,9 @@ function getWinningHand(handArr) {
     }
     // itterate through winning hands, return first hand with all true values else return false
     for(const hand in winningHands) {
-        console.log(hand,'<-hand');
+        //console.log(hand,'<-hand');
         if(Object.values(winningHands[hand].rules).every(value => value === true)) { 
-            return hand;
+            return [hand,winningHands[hand].value];
         }
     }
     return false;
