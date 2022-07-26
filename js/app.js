@@ -101,6 +101,7 @@ volume.addEventListener('input', function(e) {
 addFundsSaveButtonEl.addEventListener('click', () => {
     backgroundMusic.muted = false;
     if(newGame) {
+        backgroundMusic.play();
         backgroundMusic.paused = false;
     }
 });
@@ -110,9 +111,8 @@ dealButtonEl.addEventListener('click', () => {
 });
 addFundsButtonEl.addEventListener('click', () => {
     addFundsConfirmEl.classList.add('d-none');
+    
 });
-
-
 
 init();
 $(document).ready(function(){
@@ -120,7 +120,6 @@ $(document).ready(function(){
     backgroundMusic.muted = true;
     backgroundMusic.loop = true;
     backgroundMusic.paused = true;
-    backgroundMusic.play();
 });
 
 function playMusic() {
