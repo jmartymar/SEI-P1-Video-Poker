@@ -43,7 +43,7 @@ const standButtonEls = {
     4: document.getElementById('stand5')
 }
 
-/*---- gameplay constants -----*/
+/*---- element constants -----*/
 const chipTotalEl = document.getElementById('chip-total');
 const chipPileEl = document.getElementById('chip-pile');
 const currentBetEl = document.getElementById('current-bet');
@@ -53,7 +53,9 @@ const depositAmountEl = document.getElementById('deposit-amount-input');
 const venmoInputEl = document.getElementById('venmo-input');
 const venmoAlertEl = document.getElementById('venmo-alert');
 const playMusicButtonEl = document.getElementById('play-music-btn');
-const addFundsConfirm = document.getElementById('add-funds-confirm');
+const addFundsSaveButtonEl = document.getElementById('add-funds-save');
+const addFundsConfirmEl = document.getElementById('add-funds-alert');
+const addFundsButtonEl = document.getElementById('add-funds-button');
 
 /*----- sprite constants -----*/
 const chipCanvasEl = document.getElementById('chip-canvas');
@@ -66,10 +68,8 @@ const chipImages = new Image();
 chipImages.src = 'images/chips-spritesheet-128x72.png';
 
 /*----- audio constants ------*/
-
 const backgroundMusic = new Audio('audio/Kenny_Rogers_-_The_Gambler-Totally-Paid-For.mp3');
 const volume = document.querySelector('#volume-control');
-
 const cardPlace1 = new Audio('audio/cardPlace1.wav');
 const cardPlace2 = new Audio('audio/cardPlace2.wav');
 const cardPlace3 = new Audio('audio/cardPlace3.wav');
@@ -88,33 +88,31 @@ cardEls[2].addEventListener('click', function(){standCard(2)});
 cardEls[3].addEventListener('click', function(){standCard(3)});
 cardEls[4].addEventListener('click', function(){standCard(4)});
 
+document.getElementById('bet-add').addEventListener('click', addBet);
+document.getElementById('bet-minus').addEventListener('click', minusBet);
+document.getElementById('bet-max').addEventListener('click', addMaxBet);
+document.getElementById('add-funds-save').addEventListener('click', addFunds);
+
+
 playMusicButtonEl.addEventListener('click', playMusic);
 volume.addEventListener('input', function(e) {
-    //console.log(backgroundMusic.volume = e.currentTarget.value / 100,'current volume');
     backgroundMusic.volume = e.currentTarget.value / 100;
-})
-
-addFundsConfirm.addEventListener('click', () => {
+});
+addFundsSaveButtonEl.addEventListener('click', () => {
     backgroundMusic.muted = false;
     if(newGame) {
         backgroundMusic.paused = false;
     }
-})
-
-
+});
 dealButtonEl.addEventListener('click', () => {
     resetBoard();    
     playHand();
 });
+addFundsButtonEl.addEventListener('click', () => {
+    addFundsConfirmEl.classList.add('d-none');
+});
 
-document.getElementById('bet-add').addEventListener('click', addBet);
-document.getElementById('bet-minus').addEventListener('click', minusBet);
-document.getElementById('bet-max').addEventListener('click', addMaxBet);
 
-document.getElementById('add-funds-confirm').addEventListener('click', addFunds);
-
-// TODO need to add new game state between each hand which stores the bet for the next hand. Do not allow bet unless in prehand state
-// states: new game, betting, drawing, showdown
 
 init();
 $(document).ready(function(){
@@ -154,13 +152,22 @@ function init() {
 }
 
 function addFunds() {
-    //console.log(venmoInputEl.value);
+    let depositAmount;
     if(venmoInputEl.value) {
         venmo = true;
     }
     depositAmount = depositAmountEl.value.replace(/\$|,/g, '');
     if(!isNaN(depositAmount)) {
-        chipTotal += +depositAmount
+        chipTotal += +depositAmount;
+        addFundsConfirmEl.classList.remove('d-none');
+        addFundsConfirmEl.classList.add('alert-success');
+        addFundsConfirmEl.classList.remove('alert-danger');
+        addFundsConfirmEl.innerText = 'Added ' + depositAmount + " dollary doos!";
+    } else {
+        addFundsConfirmEl.classList.remove('d-none');
+        addFundsConfirmEl.classList.remove('alert-success');
+        addFundsConfirmEl.classList.add('alert-danger');
+        addFundsConfirmEl.innerText = 'Enter a number silly';
     }
     depositAmountEl.value = '';
     render();
@@ -236,8 +243,7 @@ return currentHand;
 
 function playHand() {
     if(newGame) { 
-        newGame = false;        
-        //chipTotal -= betAmount; 
+        newGame = false;      
     }
     if(newHand) {
         newHand = false;
@@ -383,11 +389,10 @@ function render() {
 
             }
         }
-        //update current/winning hand text 
-        //currentHandValueEl.querySelector('h1').innerText = winningHand ? winningHand[0] : 'Nothing'; // update the hand value text with highest current winning hand
         document.querySelectorAll('.bet-row').forEach(function(el) { // reset all bet rows
             el.classList.remove('bg-danger');           
         })
+        //update winning hand html
         if(winningHand) {
             let handId =  winningHand[0].toLowerCase().split(" ").join('-');
             document.getElementById(handId).classList.add('bg-danger');
@@ -397,7 +402,6 @@ function render() {
         }
         for(i = 1; i <= 5; i++) {
             betClass = '.bet-' + i;
-            //console.log(document.querySelectorAll(betClass),'<-betclass row');
             document.querySelectorAll(betClass).forEach(function(el) { // reset all bet columns
                 el.classList.remove('bg-danger');          
             })
