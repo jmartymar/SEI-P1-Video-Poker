@@ -52,6 +52,8 @@ const dealButtonEl = document.getElementById('deal-button');
 const depositAmountEl = document.getElementById('deposit-amount-input'); 
 const venmoInputEl = document.getElementById('venmo-input');
 const venmoAlertEl = document.getElementById('venmo-alert');
+const playMusicButtonEl = document.getElementById('play-music-btn');
+const addFundsConfirm = document.getElementById('add-funds-confirm');
 
 /*----- sprite constants -----*/
 const chipCanvasEl = document.getElementById('chip-canvas');
@@ -65,7 +67,8 @@ chipImages.src = 'images/chips-spritesheet-128x72.png';
 
 /*----- audio constants ------*/
 
-// constructor to hand sound objects
+const backgroundMusic = new Audio('audio/Kenny_Rogers_-_The_Gambler-Totally-Paid-For.mp3');
+const volume = document.querySelector('#volume-control');
 
 const cardPlace1 = new Audio('audio/cardPlace1.wav');
 const cardPlace2 = new Audio('audio/cardPlace2.wav');
@@ -85,6 +88,19 @@ cardEls[2].addEventListener('click', function(){standCard(2)});
 cardEls[3].addEventListener('click', function(){standCard(3)});
 cardEls[4].addEventListener('click', function(){standCard(4)});
 
+playMusicButtonEl.addEventListener('click', playMusic);
+volume.addEventListener('input', function(e) {
+    //console.log(backgroundMusic.volume = e.currentTarget.value / 100,'current volume');
+    backgroundMusic.volume = e.currentTarget.value / 100;
+})
+
+addFundsConfirm.addEventListener('click', () => {
+    backgroundMusic.muted = false;
+    if(newGame) {
+        backgroundMusic.paused = false;
+    }
+})
+
 
 dealButtonEl.addEventListener('click', () => {
     resetBoard();    
@@ -101,6 +117,28 @@ document.getElementById('add-funds-confirm').addEventListener('click', addFunds)
 // states: new game, betting, drawing, showdown
 
 init();
+$(document).ready(function(){
+    $('#add-funds-button-modal').modal('show');
+    backgroundMusic.muted = true;
+    backgroundMusic.loop = true;
+    backgroundMusic.paused = true;
+    backgroundMusic.play();
+});
+
+function playMusic() {
+    if(!backgroundMusic.paused) {
+        backgroundMusic.pause();
+        playMusicButtonEl.innerText = "Play Music";
+        playMusicButtonEl.classList.add('btn-warning');
+        playMusicButtonEl.classList.remove('btn-danger');
+    } else {
+        backgroundMusic.play();
+        playMusicButtonEl.innerText = "Pause Music";
+        playMusicButtonEl.classList.add('btn-danger');
+        playMusicButtonEl.classList.remove('btn-warning');
+    }
+
+}
 
 /*----- functions -----*/
 function init() {
@@ -121,7 +159,10 @@ function addFunds() {
         venmo = true;
     }
     depositAmount = depositAmountEl.value.replace(/\$|,/g, '');
-    chipTotal += +depositAmount
+    if(!isNaN(depositAmount)) {
+        chipTotal += +depositAmount
+    }
+    depositAmountEl.value = '';
     render();
 }
 
@@ -160,9 +201,8 @@ function buildCardsObj() {
     let cardFace;
     let i = 0;
     const cardsObj = {};
-    let cardsArr = [];
+    const cardsArr = [];
     for(let cardSuit of cardSuits) {
-
         for(let cardValue of cardValues) {
             cardFace = cardSuit + '-' + cardValue;
             cardsObj[cardFace] = {
@@ -178,8 +218,8 @@ function buildCardsObj() {
 }
 
 function pickRandomCard(arr) {
-    let rand = Math.floor(Math.random()*arr.length);
-    let randomCard = arr.splice(rand,1);
+    const rand = Math.floor(Math.random()*arr.length);
+    const randomCard = arr.splice(rand,1);
     return randomCard; 
 }
 
@@ -209,13 +249,9 @@ function playHand() {
     if(newHand) {
         init();
         currentHand = buildHand(deckArr);
+        console.log(currentHand,'<-currentHand');
         for(let card in currentHand) {
             handArr[card] = cardsObj[currentHand[card]];
-            setTimeout(function(){
-                //cardEls[cardEl].querySelector('img').src = handArr[cardEl].imgUrl;
-                cardPlace1.play();
-                cardPlace1.stop();
-            }, 200 * i);
         }
         chipTotal -= betAmount;
     } else {
@@ -227,7 +263,6 @@ function playHand() {
         currentHand = buildHand(deckArr, drawArr);
         for(let card in currentHand) {
             handArr[card] = cardsObj[currentHand[card]];
-
         } 
         if(getWinningHand(handArr)) {
             chipTotal += (getWinningHand(handArr)[1] * betAmount);
@@ -267,45 +302,57 @@ function getTile(x, y, chipX, chipY) {
 
 function drawChips() {
     ctx.clearRect(0, 0, chipCanvasEl.width, chipCanvasEl.height);
-    //let chipTotal = 5225;
-    let chipSpriteX = 0;
-    let chipSpriteY = 0;
     chipCanvasEl.innerHTML = '';
+    const spriteMapObj = {
+        7: {
+            increment: 1000000,
+            chipSpriteX: 0,
+            chipSpriteY: 1
+        },
+        6: {
+            increment: 100000,
+            chipSpriteX: 1,
+            chipSpriteY: 1
+        },
+        5: {
+            increment: 10000,
+            chipSpriteX: 2,
+            chipSpriteY: 1
+        },
+        4: {
+            increment: 1000,
+            chipSpriteX: 4,
+            chipSpriteY: 0
+        },
+        3: {
+            increment: 100,
+            chipSpriteX: 2,
+            chipSpriteY: 0
+        },
+        2: {
+            increment: 10,
+            chipSpriteX: 1,
+            chipSpriteY: 0
+        },
+        1: {
+            increment: 1,
+            chipSpriteX: 3,
+            chipSpriteY: 0
+        }
+    }
     if(chipTotal > 0) {     
         let chip;
         const chipNode = document.createElement('img');
         const chipTensArr = placeValue(chipTotal);
-        let x = 0;
+        let xStart = 0;
         for(let value of chipTensArr) {
-        const valueLength = value.toString().length;
-        let increment = 1;
             let yStart = 120;
-            if(valueLength === 5) {
-                increment = 10000;
-                chipSpriteX = 2;
-                chipSpriteY = 1;
-            } else if(valueLength === 4) {
-                increment = 1000;
-                chipSpriteX = 4;
-                chipSpriteY = 0;
-            } else if(valueLength === 3) {
-                increment = 100;
-                chipSpriteX = 2;
-                chipSpriteY = 0;
-            } else if(valueLength === 2) {
-                increment = 10;
-                chipSpriteX = 1;
-                chipSpriteY = 0;
-            } else if(valueLength === 1) {
-                increment = 1;
-                chipSpriteX = 3
-                chipSpriteY = 0;
-            }
-            for(i = 0; i < value; i += increment) {        
-                chipNode.src = getTile(chipSpriteX,chipSpriteY,x,yStart);
+            let spriteObj = spriteMapObj[value.toString().length];
+            for(i = 0; i < value; i += spriteObj.increment) {        
+                chipNode.src = getTile(spriteObj.chipSpriteX,spriteObj.chipSpriteY,xStart,yStart);
                 yStart -= 6;
             }
-            x += 50;
+            xStart += 50;
         }           
     chipCanvasEl.prepend(chipNode);
     } 
@@ -317,15 +364,12 @@ function render() {
     let betClass;
     if(!newGame) {
         let i = 1;
+        console.log(drawArr,'<-drawArr')
         for(let cardEl in cardEls) {
-            //let delayedCardEl = cardEl;
-            //delay(delayedCardEl);
              setTimeout(function(){
                  cardEls[cardEl].querySelector('img').src = handArr[cardEl].imgUrl;
-                 cardPlace1.play();
              }, 200 * i);
         i++;
-            //cardEls[cardEl].querySelector('img').src = handArr[cardEl].imgUrl;
         }
         //update stand card html
         for(const standButton in standButtonEls) {
@@ -340,13 +384,16 @@ function render() {
             }
         }
         //update current/winning hand text 
-        currentHandValueEl.querySelector('h1').innerText = winningHand ? winningHand[0] : 'Nothing'; // update the hand value text with highest current winning hand
+        //currentHandValueEl.querySelector('h1').innerText = winningHand ? winningHand[0] : 'Nothing'; // update the hand value text with highest current winning hand
         document.querySelectorAll('.bet-row').forEach(function(el) { // reset all bet rows
             el.classList.remove('bg-danger');           
         })
         if(winningHand) {
             let handId =  winningHand[0].toLowerCase().split(" ").join('-');
             document.getElementById(handId).classList.add('bg-danger');
+            currentHandValueEl.querySelector('h1').innerText = newHand ? "You have " + winningHand[0] : 'You won with ' + winningHand[0] + '!';
+        } else {
+            currentHandValueEl.querySelector('h1').innerText = newHand ? 'Nothing yet' : "You're a LOOOOOOOSER";
         }
         for(i = 1; i <= 5; i++) {
             betClass = '.bet-' + i;

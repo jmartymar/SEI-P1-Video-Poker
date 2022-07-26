@@ -216,18 +216,18 @@
                     </div>
                 </div>
             </div>
-            <div id="add-funds-container" class="col-3 text-center d-flex">
-
-                <!-- <div class="row">
-                    <div class="col-10 offset-1">
-                        <button id="start-game-btn" type="button" class="btn btn-success col-12">Start Game</button>
+            <div id="add-funds-container" class="col-3 text-center">          
+                <div class="row">
+                    <div id="add-funds" class="col-10 offset-1">
+                        <button id="add-funds-button" type="button" class="btn btn-primary col-12" data-bs-toggle="modal" data-bs-target="#add-funds-button-modal">Add Funds</button>
                     </div>
-                </div> -->
-                
-                <div id="add-funds" class="col-10 offset-1 align-self-end">
-                    <button id="add-funds-button" type="button" class="btn btn-primary col-12" data-bs-toggle="modal" data-bs-target="#add-funds-button-modal">Add Funds</button>
                 </div>
-                
+                <div class="row"></div>
+                    <div id="music-btn-div" class="col-10 offset-1">
+                        <button id="play-music-btn" type="button" class="btn btn-danger col-12">Pause Music</button>
+                        <input type="range" id="volume-control">
+                    </div>
+                </div>             
             </div>
         </div>
         <!-- Modals -->
@@ -235,9 +235,9 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                    <h5 class="modal-title" id="add-funds-modal-title">Add Funds</h5>
+                    <h5 class="modal-title" id="add-funds-modal-title">Add Funds to Play</h5>
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                        <span aria-hidden="false">&times;</span>
                     </button>
                     </div>
                     <div class="modal-body">
@@ -245,23 +245,31 @@
                         <div id="venmo-div" class="col-12">
                             <input id="venmo-input" type="text" class="form-control" placeholder="Enter Venmo account info" aria-label="Amount (to the nearest dollar)">
                             <div id="venmo-alert" class="alert alert-danger text-center col-12 d-none" role="alert">
-                                Why would you do that?  Don't do that! I'm probably a Nigerian banker, le sigh.
+                                Why would you do that?  Don't do that! I'm probably a Nigerian prince, smh. Thanks for the boat tho!<br><br>
+                                <div class="pre-div">
+                                    <pre>
+                __/___            
+            _____/______|           
+    _______/_____\_______\_____     
+    \              < < <       |    
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</pre>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="input-group mb-3">
-                        <input id="deposit-amount-input" type="text" class="form-control" placeholder="Enter amount up to 99999.  Don't try it, I'm not responsible for your browser." aria-label="Amount (to the nearest dollar)">
+                        <input id="deposit-amount-input" type="text" class="form-control" placeholder="Enter amount up to 9,999,999.  Don't try it, I'm not responsible for your browser." aria-label="Amount (to the nearest dollar)">
                     </div>
                     <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button id="add-funds-confirm" type="button" class="btn btn-primary" data-bs-dismiss="modal">Save changes</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="add-funds-confirm" type="button" class="btn btn-primary">Save changes</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <script>
-        //const myModalAlternative = new bootstrap.Modal('#add-funds-button-modal');
+        
     </script>
 </body>
 </html>
