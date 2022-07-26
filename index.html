@@ -5,12 +5,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Poker But Awesomer™</title>
-    <!-- CSS only -->
+    <!-- CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
-    <!-- JavaScript Bundle with Popper -->
     <link href="css/styles.css" rel="stylesheet">
-    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+    <!-- JS -->
+    <script defer src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script> 
     <script defer src="js/app.js"></script>
+
 </head>
 <body>
     <div class="container">
@@ -180,7 +182,9 @@
             <div class="col-3 bg-danger text-center mt-auto">
                 <div class="row">
                     <div id="chip-pile" class="col-12 bg-info">
-                        Chip pile
+                        <canvas id="chip-canvas">
+
+                        </canvas>
                     </div>
                 </div>
                 <div class="row">
@@ -208,7 +212,7 @@
                     </div>
 
                     <div class="col-5">
-                        <button id="deal-button" type="button" class="btn btn-warning">Deal</button>
+                        <button id="deal-button" type="button" class="btn btn-warning">Deal Hand</button>
                     </div>
                 </div>
             </div>
@@ -219,13 +223,45 @@
                         <button id="start-game-btn" type="button" class="btn btn-success col-12">Start Game</button>
                     </div>
                 </div> -->
-                    <div id="add-funds" class="col-10 offset-1 align-self-end">
-                        <button id="add-funds-button" type="button" class="btn btn-primary col-12 ">Add Funds</button>
-                    </div>
+                
+                <div id="add-funds" class="col-10 offset-1 align-self-end">
+                    <button id="add-funds-button" type="button" class="btn btn-primary col-12" data-bs-toggle="modal" data-bs-target="#add-funds-button-modal">Add Funds</button>
+                </div>
                 
             </div>
         </div>
-
-    </div>    
+        <!-- Modals -->
+        <div class="modal fade modal-lg" id="add-funds-button-modal" tabindex="-1" role="dialog" aria-labelledby="add-funds-buttonTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="add-funds-modal-title">Add Funds</h5>
+                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Please enter your Venmo account and amount to deposit below</p><div class="input-group mb-3">
+                        <div id="venmo-div" class="col-12">
+                            <input id="venmo-input" type="text" class="form-control" placeholder="Enter Venmo account info" aria-label="Amount (to the nearest dollar)">
+                            <div id="venmo-alert" class="alert alert-danger text-center col-12 d-none" role="alert">
+                                Why would you do that?  Don't do that! I'm probably a Nigerian banker, le sigh.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <input id="deposit-amount-input" type="text" class="form-control" placeholder="Enter amount up to 99999.  Don't try it, I'm not responsible for your browser." aria-label="Amount (to the nearest dollar)">
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="add-funds-confirm" type="button" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        //const myModalAlternative = new bootstrap.Modal('#add-funds-button-modal');
+    </script>
 </body>
 </html>

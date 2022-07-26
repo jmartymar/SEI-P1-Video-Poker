@@ -22,8 +22,9 @@ let newGame = true;
 let currentHand = [];
 let drawArr = [];
 let newHand = false;
-let chipTotal = 100;
+let chipTotal = 0;
 let betAmount = 0;
+let venmo = false;
 
 /*----- cached element references -----*/
 const cardEls = {
@@ -46,7 +47,42 @@ const chipTotalEl = document.getElementById('chip-total');
 const chipPileEl = document.getElementById('chip-pile');
 const currentBetEl = document.getElementById('current-bet');
 const currentHandValueEl = document.getElementById('hand-value');
+const dealButtonEl = document.getElementById('deal-button');
+const depositAmountEl = document.getElementById('deposit-amount-input'); 
+const venmoInputEl = document.getElementById('venmo-input');
+const venmoAlertEl = document.getElementById('venmo-alert');
 
+/*----- sprite constants -----*/
+const chipCanvasEl = document.getElementById('chip-canvas');
+const ctx = chipCanvasEl.getContext('2d');
+const spriteWidth = 128;
+const spriteHeight = 72;
+const spriteCols = 5;
+const spriteRows = 2;
+const chipImages = new Image();
+//chipImages.crossOrigin="anonymous"
+chipImages.src = 'images/chips-spritesheet-128x72.png';
+//chipImages.onload = drawChips;
+let chipValue;
+
+
+function getTile(x, y, chipX, chipY) {
+    ctx.drawImage(chipImages, x * spriteWidth + 1, y * spriteHeight + 1, spriteWidth, spriteHeight, chipX, chipY, 64, 32);
+    //console.log(chipCanvasEl,'<-chipCanvasEl');
+    //console.log(chipCanvasEl.toDataURL('image/png'),'<-chipCanvasEl.toDataUrl');
+    return chipCanvasEl.toDataURL('image/png');
+}
+
+
+/// https://www.tutorialspoint.com/convert-number-to-tens-hundreds-thousands-and-so-on-javascript
+const placeValue = (num, res = [], factor = 1) => {
+    if(num){
+       const val = (num % 10) * factor;
+       res.unshift(val);
+       return placeValue(Math.floor(num / 10), res, factor * 10);
+    };
+    return res;
+ };
 
 /*----- event listeners -----*/
 standButtonEls[0].addEventListener('click', function(){standCard(0)});
@@ -62,11 +98,16 @@ cardEls[3].addEventListener('click', function(){standCard(3)});
 cardEls[4].addEventListener('click', function(){standCard(4)});
 
 
-document.getElementById('deal-button').addEventListener('click', playHand);
+dealButtonEl.addEventListener('click', () => {
+    resetBoard();    
+    playHand();
+});
 
 document.getElementById('bet-add').addEventListener('click', addBet);
 document.getElementById('bet-minus').addEventListener('click', minusBet);
 document.getElementById('bet-max').addEventListener('click', addMaxBet);
+
+document.getElementById('add-funds-confirm').addEventListener('click', addFunds);
 
 // TODO need to add new game state between each hand which stores the bet for the next hand. Do not allow bet unless in prehand state
 // states: new game, betting, drawing, showdown
@@ -86,12 +127,51 @@ function init() {
     
 }
 
-//build the cards object;
+function addFunds() {
+    //console.log(venmoInputEl.value);
+    if(venmoInputEl.value) {
+        venmo = true;
+    }
+    chipTotal += +depositAmountEl.value
+    render();
+}
+
+function addBet() {
+    if(betAmount < 5) {
+        betAmount += 1;
+    }
+    render();
+}
+function minusBet() {
+    if(betAmount > 0) {
+        betAmount -= 1;
+    }
+    render();
+}
+function addMaxBet() {
+    if(betAmount < 5) {
+        betAmount += (5 - betAmount);
+    }
+    render();
+}
+
+function standCard(num) {
+    if(newHand) {
+        if(standArr.includes(num)) {
+            standArr = standArr.filter(value => value != num);
+        } else {
+            standArr.push(num);
+        }
+    }
+render();
+}
+
+
 function buildCardsObj() {
     let cardFace;
     let i = 0;
     const cardsObj = {};
-    var cardsArr = [];
+    let cardsArr = [];
     for(let cardSuit of cardSuits) {
 
         for(let cardValue of cardValues) {
@@ -127,16 +207,13 @@ return currentHand;
 
 function playHand() {
     if(newGame) { 
-        newGame = false; 
+        newGame = false;        
+        //chipTotal -= betAmount; 
     }
     if(newHand) {
         newHand = false;
     } else {
         newHand = true;
-    }
-    if(chipTotal <= 0) {
-        promptAddFunds(); // prompt user to add funds if playHand is invoked with <= chipTotal
-        return;
     }
     
     // if new game, build full hand, else update hand
@@ -146,52 +223,81 @@ function playHand() {
         for(let card in currentHand) {
             handArr[card] = cardsObj[currentHand[card]];
         }
+        chipTotal -= betAmount;
     } else {
-        for(i = 0; i <= 4; i++) {
-            
+        //standArr.sort();
+        for(i = 0; i <= 4; i++) {            
             if(!standArr.includes(i)) { drawArr.push(i) }
         }
+        drawArr.sort();
         currentHand = buildHand(deckArr, drawArr);
         for(let card in currentHand) {
+
             handArr[card] = cardsObj[currentHand[card]];
         } 
         if(getWinningHand(handArr)) {
             chipTotal += (getWinningHand(handArr)[1] * betAmount);
         }
-        chipTotal -= betAmount;
         standArr = [];    
     }
     render();
 }
 
-function addBet() {
-    if(betAmount < 5) {
-        betAmount += 1;
-    }
-    render();
-}
-function minusBet() {
-    if(betAmount > 0) {
-        betAmount -= 1;
-    }
-    render();
-}
-function addMaxBet() {
-    if(betAmount < 5) {
-        betAmount += (5 - betAmount);
-    }
-    render();
-}
 
-function standCard(num) {
-    if(newHand) {
-        if(standArr.includes(num)) {
-            standArr = standArr.filter(value => value != num);
-        } else {
-            standArr.push(num);
+/*----- view functions -----*/
+
+function resetBoard() {
+    for(let cardEl in cardEls) {
+        if(!standArr.includes(+cardEl)) {
+            cardEls[cardEl].querySelector('img').src = 'images/backs/blue.svg';
         }
     }
-render();
+}
+
+function drawChips() {
+    ctx.clearRect(0, 0, chipCanvasEl.width, chipCanvasEl.height);
+    //let chipTotal = 5225;
+    let chipSpriteX = 0;
+    let chipSpriteY = 0;
+    chipCanvasEl.innerHTML = '';
+    if(chipTotal > 0) {     
+        let chip;
+        const chipNode = document.createElement('img');
+        const chipTensArr = placeValue(chipTotal);
+        let x = 0;
+        for(let value of chipTensArr) {
+        const valueLength = value.toString().length;
+        let increment = 1;
+            let yStart = 120;
+            if(valueLength === 5) {
+                increment = 10000;
+                chipSpriteX = 2;
+                chipSpriteY = 1;
+            } else if(valueLength === 4) {
+                increment = 1000;
+                chipSpriteX = 4;
+                chipSpriteY = 0;
+            } else if(valueLength === 3) {
+                increment = 100;
+                chipSpriteX = 2;
+                chipSpriteY = 0;
+            } else if(valueLength === 2) {
+                increment = 10;
+                chipSpriteX = 1;
+                chipSpriteY = 0;
+            } else if(valueLength === 1) {
+                increment = 1;
+                chipSpriteX = 3
+                chipSpriteY = 0;
+            }
+            for(i = 0; i < value; i += increment) {        
+                chipNode.src = getTile(chipSpriteX,chipSpriteY,x,yStart);
+                yStart -= 6;
+            }
+            x += 50;
+        }           
+    chipCanvasEl.prepend(chipNode);
+    } 
 }
 
 function render() {
@@ -199,21 +305,28 @@ function render() {
     const winningHand = getWinningHand(handArr);
     let betClass;
     if(!newGame) {
-        for(const cardEl in cardEls) {
-            cardEls[cardEl].querySelector('img').src = handArr[cardEl].imgUrl;
+        let i = 1;
+        for(let cardEl in cardEls) {
+            //let delayedCardEl = cardEl;
+            //delay(delayedCardEl);
+             setTimeout(function(){
+                 cardEls[cardEl].querySelector('img').src = handArr[cardEl].imgUrl;
+             }, 100 * i);
+        i++;
+            //cardEls[cardEl].querySelector('img').src = handArr[cardEl].imgUrl;
         }
         //update stand card html
-            for(const standButton in standButtonEls) {
-                if(newHand) {
-                    cardEls[+standButton].querySelector('img').style.border = standArr.includes(+standButton) ? '2px solid red' : 'none';
-                    standButtonEls[+standButton].classList.remove(standArr.includes(+standButton) ? 'btn-danger' : 'btn-info');
-                    standButtonEls[+standButton].classList.add(standArr.includes(+standButton) ? 'btn-info' : 'btn-danger');    
-                    standButtonEls[+standButton].disabled = false;    
-                } else {
-                    standButtonEls[+standButton].disabled = true;
+        for(const standButton in standButtonEls) {
+            if(newHand) {
+                cardEls[+standButton].querySelector('img').style.border = standArr.includes(+standButton) ? '2px solid red' : 'none';
+                standButtonEls[+standButton].classList.remove(standArr.includes(+standButton) ? 'btn-danger' : 'btn-info');
+                standButtonEls[+standButton].classList.add(standArr.includes(+standButton) ? 'btn-info' : 'btn-danger');    
+                standButtonEls[+standButton].disabled = false;    
+            } else {
+                standButtonEls[+standButton].disabled = true;
 
-                }
             }
+        }
         //update current/winning hand text 
         currentHandValueEl.querySelector('h1').innerText = winningHand ? winningHand[0] : 'Nothing'; // update the hand value text with highest current winning hand
         document.querySelectorAll('.bet-row').forEach(function(el) { // reset all bet rows
@@ -225,7 +338,7 @@ function render() {
         }
         for(i = 1; i <= 5; i++) {
             betClass = '.bet-' + i;
-            console.log(document.querySelectorAll(betClass),'<-betclass row');
+            //console.log(document.querySelectorAll(betClass),'<-betclass row');
             document.querySelectorAll(betClass).forEach(function(el) { // reset all bet columns
                 el.classList.remove('bg-danger');          
             })
@@ -237,9 +350,24 @@ function render() {
         }
 
     }
+    (newHand && newGame) || !newHand ? dealButtonEl.innerText = 'Deal Hand' : dealButtonEl.innerText = 'Draw New Cards';
     newHand && !newGame ? currentHandValueEl.classList.remove('bg-primary') : currentHandValueEl.classList.add('bg-primary');
-    chipTotalEl.innerText = chipTotal;
+    betAmount <= 0 || chipTotal <= 0 ? dealButtonEl.disabled = true : dealButtonEl.disabled = false;
+    
+    chipTotalEl.innerText = '$' + chipTotal.toLocaleString('en-US'); // update chip total text
     document.getElementById('current-bet').innerText = 'Current bet: ' + betAmount;
+    if(venmo) {
+        venmoInputEl.value = '';
+        venmoInputEl.classList.add('d-none');
+        venmoAlertEl.classList.remove('d-none');
+        venmo = false;
+    } else {
+        venmoInputEl.classList.remove('d-none');
+        venmoAlertEl.classList.add('d-none');
+    }
+    if(chipTotal > 0) {
+        drawChips();
+    }
 
 }
 
@@ -249,23 +377,31 @@ function isStraight(handArr) {
 
     let rankMin;
     let rankMax;
-
+    let aceLowStraight = [0, 1, 2, 3, 12];
+    // handArr = [
+    //     {suit: 'diamonds', value: 'r02', imgUrl: 'images/diamonds/diamonds-r02.svg'},
+    //     {suit: 'diamonds', value: 'A', imgUrl: 'images/diamonds/diamonds-K.svg'},
+    //     {suit: 'diamonds', value: 'r07', imgUrl: 'images/diamonds/diamonds-r05.svg'},
+    //     {suit: 'spades', value: 'r04', imgUrl: 'images/spades/spades-J.svg'},
+    //     {suit: 'spades', value: 'r05', imgUrl: 'images/spades/spades-r06.svg'}
+    // ]
     const cardRanksArr = getCardRanksArr(handArr);
     rankMin = Math.min(...cardRanksArr);   //get lowest card value
     rankMax = Math.max(...cardRanksArr);    // get highest card value
     if(cardRanksArr.every(value => (value >= rankMin) && (value <= rankMax) && (countDuplicates(cardRanksArr) === 0) && (rankMax - rankMin === 4) && handArr.length > 0)) { // if highest and lowest are within 4, not duplicates, and within the min/max range then it's a straight
         return true;
+    } else if(cardRanksArr.every(value => aceLowStraight.includes(value))) { // check if hand is ace low straight
+        return true;
     } else {
         return false;
     }
-        //TODO Need to account for Ace low straight
 }
 
 function isFlush(handArr) {
     const suitsArr = [];
     let suitMatches;
-    for(const elem of handArr) {
-        suitsArr.push(elem.suit);        // create array of suites
+    for(const card of handArr) {
+        suitsArr.push(card.suit);        // create array of suites
     }
     suitMatches = suitsArr.reduce((acc, value) => {  // reduce suits to get count of each suit
         acc[value] ? acc[value]++ : acc[value] = 1
@@ -283,8 +419,8 @@ function isFlush(handArr) {
 function isThreeOfKind(handArr) {
     const valueArr = [];
     let valueMatches;
-    for(const elem of handArr) {          
-        valueArr.push(elem.value);
+    for(const card of handArr) {          
+        valueArr.push(card.value);
     }
     valueMatches = valueArr.reduce((acc, value) => {
         acc[value] ? acc[value]++ : acc[value] = 1
@@ -300,8 +436,8 @@ function isThreeOfKind(handArr) {
 function isPair(handArr) {
     const valueArr = [];
     let valueMatches;
-    for(const elem of handArr) {          
-        valueArr.push(elem.value);
+    for(const card of handArr) {          
+        valueArr.push(card.value);
     }
     valueMatches = valueArr.reduce((acc, value) => {
         acc[value] ? acc[value]++ : acc[value] = 1
@@ -317,8 +453,8 @@ function isPair(handArr) {
 function isFourOfKind(handArr) {
     const valueArr = [];
     let valueMatches;
-    for(const elem of handArr) {          
-        valueArr.push(elem.value);
+    for(const card of handArr) {          
+        valueArr.push(card.value);
     }
     valueMatches = valueArr.reduce((acc, value) => {
         acc[value] ? acc[value]++ : acc[value] = 1
@@ -335,8 +471,8 @@ function isTwoPair(handArr) {
     const valueArr = [];
     let valueMatches;
     let pairs = 0;
-    for(const elem of handArr) {          
-        valueArr.push(elem.value);
+    for(const card of handArr) {          
+        valueArr.push(card.value);
     }
     valueMatches = valueArr.reduce((acc, value) => {
         acc[value] ? acc[value]++ : acc[value] = 1
@@ -382,16 +518,16 @@ function isPairJacksPlus(handArr) {
     const valueArr = [];
     let valueMatches;
     const cardRanksArr = getCardRanksArr(handArr);
-    for(const elem of handArr) {          
-        valueArr.push(elem.value);
+    for(const card of handArr) {          
+        valueArr.push(card.value);
     }
     valueMatches = valueArr.reduce((acc, value) => {
         acc[value] ? acc[value]++ : acc[value] = 1
         return acc;
     }, {});
 
-    for(const elem in valueMatches) {
-        if(+Object.keys(cardValues).find(key => cardValues[key] === elem) >= 9 && valueMatches[elem] == 2) {
+    for(const cardValue in valueMatches) {
+        if(+Object.keys(cardValues).find(key => cardValues[key] === cardValue) >= 9 && valueMatches[cardValue] == 2) {
             return true;
         }
     } 
