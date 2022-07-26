@@ -42,8 +42,6 @@ const standButtonEls = {
     3: document.getElementById('stand4'),
     4: document.getElementById('stand5')
 }
-
-/*---- element constants -----*/
 const chipTotalEl = document.getElementById('chip-total');
 const chipPileEl = document.getElementById('chip-pile');
 const currentBetEl = document.getElementById('current-bet');
@@ -56,6 +54,7 @@ const playMusicButtonEl = document.getElementById('play-music-btn');
 const addFundsSaveButtonEl = document.getElementById('add-funds-save');
 const addFundsConfirmEl = document.getElementById('add-funds-alert');
 const addFundsButtonEl = document.getElementById('add-funds-button');
+const betButtonEls = document.querySelectorAll('.bet-btns');
 
 /*----- sprite constants -----*/
 const chipCanvasEl = document.getElementById('chip-canvas');
@@ -147,7 +146,6 @@ function init() {
     } else {
         render();
     }
-    
 }
 
 function addFunds() {
@@ -254,9 +252,11 @@ function playHand() {
     if(newHand) {
         init();
         currentHand = buildHand(deckArr);
-        console.log(currentHand,'<-currentHand');
         for(let card in currentHand) {
             handArr[card] = cardsObj[currentHand[card]];
+        }
+        if(chipTotal < betAmount){
+            betAmount = chipTotal;
         }
         chipTotal -= betAmount;
     } else {
@@ -369,10 +369,12 @@ function render() {
     let betClass;
     if(!newGame) {
         let i = 1;
-        console.log(drawArr,'<-drawArr')
+
         for(let cardEl in cardEls) {
+            console.log(cardEl);
              setTimeout(function(){
                  cardEls[cardEl].querySelector('img').src = handArr[cardEl].imgUrl;
+                 //dealing
              }, 200 * i);
         i++;
         }
@@ -391,13 +393,17 @@ function render() {
         document.querySelectorAll('.bet-row').forEach(function(el) { // reset all bet rows
             el.classList.remove('bg-danger');           
         })
-        //update winning hand html
+        
         if(winningHand) {
             let handId =  winningHand[0].toLowerCase().split(" ").join('-');
-            document.getElementById(handId).classList.add('bg-danger');
-            currentHandValueEl.querySelector('h1').innerText = newHand ? "You have " + winningHand[0] : 'You won with ' + winningHand[0] + '!';
+            document.getElementById(handId).classList.add('bg-danger');        
+            setTimeout(function(){
+                currentHandValueEl.querySelector('h1').innerText = newHand ? "You have " + winningHand[0] : 'You won with ' + winningHand[0] + '!'; //update winning hand text
+            }, 1000);
         } else {
-            currentHandValueEl.querySelector('h1').innerText = newHand ? 'Nothing yet' : "You're a LOOOOOOOSER";
+            setTimeout(function(){
+                currentHandValueEl.querySelector('h1').innerText = newHand ? 'Nothing yet' : "You're a LOOOOOOOSER"; //update losing hand text
+            }, 1000);            
         }
         for(i = 1; i <= 5; i++) {
             betClass = '.bet-' + i;
@@ -410,11 +416,23 @@ function render() {
                 })
             }
         }
-
     }
-    (newHand && newGame) || !newHand ? dealButtonEl.innerText = 'Deal Hand' : dealButtonEl.innerText = 'Draw New Cards';
+    if(!newHand || newGame) {
+        betAmount <= 0 || chipTotal <= 0 ? dealButtonEl.disabled = true : dealButtonEl.disabled = false;
+    }
+    if((newHand && newGame) || !newHand) {
+        dealButtonEl.innerText = 'Deal Hand';
+        betButtonEls.forEach((buttonEl) => {
+        buttonEl.disabled = false;
+        })
+     } else {
+        dealButtonEl.innerText = 'Draw New Cards';
+        betButtonEls.forEach((buttonEl) => {
+        buttonEl.disabled = true;
+        })
+
+     }
     newHand && !newGame ? currentHandValueEl.classList.remove('bg-primary') : currentHandValueEl.classList.add('bg-primary');
-    betAmount <= 0 || chipTotal <= 0 ? dealButtonEl.disabled = true : dealButtonEl.disabled = false;
     
     chipTotalEl.innerText = '$' + chipTotal.toLocaleString('en-US'); // update chip total text
     document.getElementById('current-bet').innerText = 'Current bet: ' + betAmount;
@@ -427,8 +445,35 @@ function render() {
         venmoInputEl.classList.remove('d-none');
         venmoAlertEl.classList.add('d-none');
     }
-    if(chipTotal > 0) {
+    if(chipTotal >= 0) {
         drawChips();
+    }
+    
+    if(chipTotal === 0 && betAmount === 0) {
+        document.getElementById('deal-hand-tooltip').setAttribute('title', 'Add a bet and funds to play!');
+        $(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+    } else if(chipTotal === 0 && betAmount > 0) {
+        $(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip('dispose');
+        })
+        document.getElementById('deal-hand-tooltip').setAttribute('title', 'Add funds to play!');
+        $(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+    } else if(betAmount === 0 && chipTotal > 0) {
+        $(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip('dispose');
+        })
+        document.getElementById('deal-hand-tooltip').setAttribute('title', 'Make a bet to play!');
+        $(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+    } else {
+        $(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip('dispose');
+        })
     }
 
 }
