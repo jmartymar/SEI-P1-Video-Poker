@@ -43,6 +43,7 @@ const standButtonEls = {
     4: document.getElementById('stand5')
 }
 
+/*---- gameplay constants -----*/
 const chipTotalEl = document.getElementById('chip-total');
 const chipPileEl = document.getElementById('chip-pile');
 const currentBetEl = document.getElementById('current-bet');
@@ -60,29 +61,16 @@ const spriteHeight = 72;
 const spriteCols = 5;
 const spriteRows = 2;
 const chipImages = new Image();
-//chipImages.crossOrigin="anonymous"
 chipImages.src = 'images/chips-spritesheet-128x72.png';
-//chipImages.onload = drawChips;
-let chipValue;
 
+/*----- audio constants ------*/
 
-function getTile(x, y, chipX, chipY) {
-    ctx.drawImage(chipImages, x * spriteWidth + 1, y * spriteHeight + 1, spriteWidth, spriteHeight, chipX, chipY, 64, 32);
-    //console.log(chipCanvasEl,'<-chipCanvasEl');
-    //console.log(chipCanvasEl.toDataURL('image/png'),'<-chipCanvasEl.toDataUrl');
-    return chipCanvasEl.toDataURL('image/png');
-}
+// constructor to hand sound objects
 
-
-/// https://www.tutorialspoint.com/convert-number-to-tens-hundreds-thousands-and-so-on-javascript
-const placeValue = (num, res = [], factor = 1) => {
-    if(num){
-       const val = (num % 10) * factor;
-       res.unshift(val);
-       return placeValue(Math.floor(num / 10), res, factor * 10);
-    };
-    return res;
- };
+const cardPlace1 = new Audio('audio/cardPlace1.wav');
+const cardPlace2 = new Audio('audio/cardPlace2.wav');
+const cardPlace3 = new Audio('audio/cardPlace3.wav');
+const cardPlace4 = new Audio('audio/cardPlace4.wav');
 
 /*----- event listeners -----*/
 standButtonEls[0].addEventListener('click', function(){standCard(0)});
@@ -132,7 +120,8 @@ function addFunds() {
     if(venmoInputEl.value) {
         venmo = true;
     }
-    chipTotal += +depositAmountEl.value
+    depositAmount = depositAmountEl.value.replace(/\$|,/g, '');
+    chipTotal += +depositAmount
     render();
 }
 
@@ -222,6 +211,11 @@ function playHand() {
         currentHand = buildHand(deckArr);
         for(let card in currentHand) {
             handArr[card] = cardsObj[currentHand[card]];
+            setTimeout(function(){
+                //cardEls[cardEl].querySelector('img').src = handArr[cardEl].imgUrl;
+                cardPlace1.play();
+                cardPlace1.stop();
+            }, 200 * i);
         }
         chipTotal -= betAmount;
     } else {
@@ -232,8 +226,8 @@ function playHand() {
         drawArr.sort();
         currentHand = buildHand(deckArr, drawArr);
         for(let card in currentHand) {
-
             handArr[card] = cardsObj[currentHand[card]];
+
         } 
         if(getWinningHand(handArr)) {
             chipTotal += (getWinningHand(handArr)[1] * betAmount);
@@ -242,6 +236,17 @@ function playHand() {
     }
     render();
 }
+
+
+/// https://www.tutorialspoint.com/convert-number-to-tens-hundreds-thousands-and-so-on-javascript
+const placeValue = (num, res = [], factor = 1) => {
+    if(num){
+       const val = (num % 10) * factor;
+       res.unshift(val);
+       return placeValue(Math.floor(num / 10), res, factor * 10);
+    };
+    return res;
+ };
 
 
 /*----- view functions -----*/
@@ -253,6 +258,12 @@ function resetBoard() {
         }
     }
 }
+
+function getTile(x, y, chipX, chipY) {
+    ctx.drawImage(chipImages, x * spriteWidth + 1, y * spriteHeight + 1, spriteWidth, spriteHeight, chipX, chipY, 64, 32);
+    return chipCanvasEl.toDataURL('image/png');
+}
+
 
 function drawChips() {
     ctx.clearRect(0, 0, chipCanvasEl.width, chipCanvasEl.height);
@@ -311,7 +322,8 @@ function render() {
             //delay(delayedCardEl);
              setTimeout(function(){
                  cardEls[cardEl].querySelector('img').src = handArr[cardEl].imgUrl;
-             }, 100 * i);
+                 cardPlace1.play();
+             }, 200 * i);
         i++;
             //cardEls[cardEl].querySelector('img').src = handArr[cardEl].imgUrl;
         }
