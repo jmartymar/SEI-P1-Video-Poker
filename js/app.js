@@ -69,10 +69,6 @@ chipImages.src = 'images/chips-spritesheet-128x72.png';
 /*----- audio constants ------*/
 const backgroundMusic = new Audio('audio/Kenny_Rogers_-_The_Gambler-Totally-Paid-For.mp3');
 const volume = document.querySelector('#volume-control');
-const cardPlace1 = new Audio('audio/cardPlace1.wav');
-const cardPlace2 = new Audio('audio/cardPlace2.wav');
-const cardPlace3 = new Audio('audio/cardPlace3.wav');
-const cardPlace4 = new Audio('audio/cardPlace4.wav');
 
 /*----- event listeners -----*/
 standButtonEls[0].addEventListener('click', function(){standCard(0)});
