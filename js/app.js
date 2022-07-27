@@ -64,7 +64,9 @@ const spriteHeight = 72;
 const spriteCols = 5;
 const spriteRows = 2;
 const chipImages = new Image();
-chipImages.src = 'images/chips-spritesheet-128x72.png';
+chipImages.crossOrigin="anonymous";
+chipImages.src = 'https://i.imgur.com/PHUUJk0.png';
+console.log(chipImages,'<-chipImages');
 
 /*----- audio constants ------*/
 const backgroundMusic = new Audio('audio/Kenny_Rogers_-_The_Gambler-Totally-Paid-For.mp3');
@@ -142,6 +144,7 @@ function init() {
     } else {
         render();
     }
+    backgroundMusic.volume = 0.5;
 }
 
 function addFunds() {
