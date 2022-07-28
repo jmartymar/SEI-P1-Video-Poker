@@ -142,7 +142,7 @@ addFundsButtonEl.addEventListener('click', () => {
 
 // display add funds modal on page load
 $(document).ready(function(){
-    $('#add-funds-button-modal').modal('show');
+    //$('#add-funds-button-modal').modal('show');
     backgroundMusic.muted = true;
     backgroundMusic.loop = true;
     backgroundMusic.paused = true;
