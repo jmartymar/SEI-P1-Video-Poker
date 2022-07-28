@@ -6,14 +6,21 @@ Run of the mill Las Vegas video poker game, but less obnoxious.
 Now with mouse support!
 
 ## Screenshots
-Splash screen
+<details>
+<summary>Splash screen</summary>
+<br>
 <img src="images/VPBA-1.png">
-
-Add funds interface
+</details>
+<details>
+<summary>Add funds interface</summary>
+<br>
 <img src="images/VPBA-2.png">
-
-Gameplay
+</details>
+<details>
+<summary>Gameplay</summary>
+<br>
 <img src="images/VPBA-3.png">
+</details>
 
 ## Technologies Used
 - JavaScript
