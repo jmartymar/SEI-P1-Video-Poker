@@ -285,7 +285,6 @@ function playHand() {
         }
         chipTotal -= betAmount;
     } else {
-        //standArr.sort();
         for(i = 0; i <= 4; i++) {            
             if(!standArr.includes(i)) { drawArr.push(i) }
         }
