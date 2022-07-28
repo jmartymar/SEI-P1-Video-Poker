@@ -121,6 +121,7 @@ document.getElementById('bet-max').addEventListener('click', addMaxBet);
 document.getElementById('add-funds-save').addEventListener('click', addFunds);
 
 playMusicButtonEl.addEventListener('click', playMusic);
+
 volume.addEventListener('input', function(e) {
     backgroundMusic.volume = e.currentTarget.value / 100;
 });
@@ -144,7 +145,7 @@ addFundsButtonEl.addEventListener('click', () => {
 });
 
 function playMusic() {
-    if(!backgroundMusic.paused) {
+    if(!backgroundMusic.paused) {        
         backgroundMusic.pause();
         playMusicButtonEl.innerText = "Play Music";
         playMusicButtonEl.classList.add('btn-warning');
