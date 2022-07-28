@@ -59,7 +59,7 @@ const spriteRows = 2;
 const chipImages = new Image();
 chipImages.crossOrigin='anonymous';
 chipImages.src = 
-    'https://raw.githubusercontent.com/jmartymar/SEI-P1-Video-Poker/main/images/chips-spritesheet-128x72.png';
+    'https://raw.githubusercontent.com/jmartymar/SEI-P1-Video-Poker/gh-pages/images/chips-spritesheet-128x72.png';
 const spriteMapObj = {
     7: {
         increment: 1000000,
@@ -124,28 +124,23 @@ playMusicButtonEl.addEventListener('click', playMusic);
 volume.addEventListener('input', function(e) {
     backgroundMusic.volume = e.currentTarget.value / 100;
 });
+
 addFundsSaveButtonEl.addEventListener('click', () => {
-    backgroundMusic.muted = false;
-    if(newGame) {
-        backgroundMusic.play();
-        backgroundMusic.paused = false;
-    }
+    setTimeout(function(){
+        venmoAlertEl.classList.add('d-none');
+        venmoInputEl.classList.remove('d-none');
+        $('#add-funds-button-modal').modal('hide');
+    }, 2000);
+
 });
+
 dealButtonEl.addEventListener('click', () => {
     resetBoard();    
     playHand();
 });
-addFundsButtonEl.addEventListener('click', () => {
-    addFundsConfirmEl.classList.add('d-none');
-    
-});
 
-// display add funds modal on page load
-$(document).ready(function(){
-    //$('#add-funds-button-modal').modal('show');
-    backgroundMusic.muted = true;
-    backgroundMusic.loop = true;
-    backgroundMusic.paused = true;
+addFundsButtonEl.addEventListener('click', () => {
+    addFundsConfirmEl.classList.add('d-none');    
 });
 
 function playMusic() {
@@ -162,6 +157,7 @@ function playMusic() {
     }
 }
 
+init();
 /*----- functions -----*/
 function init() {
     if(newHand) { 
@@ -169,10 +165,9 @@ function init() {
         standArr = [];
         drawArr = [];
         currentHand = [];
-    } else {
-        render();
     }
     backgroundMusic.volume = 0.5;
+    render();
 }
 
 function addFunds() {
@@ -438,12 +433,12 @@ function render() {
     if((newHand && newGame) || !newHand) {
         dealButtonEl.innerText = 'Deal Hand';
         betButtonEls.forEach((buttonEl) => {
-        buttonEl.disabled = false;
+            buttonEl.disabled = false;
         })
      } else {
         dealButtonEl.innerText = 'Draw New Cards';
         betButtonEls.forEach((buttonEl) => {
-        buttonEl.disabled = true;
+            buttonEl.disabled = true;
         })
 
      }
@@ -502,7 +497,7 @@ function isStraight(handArr) {
     rankMax = Math.max(...cardRanksArr);  // get highest card value
     if(cardRanksArr.every(value => (value >= rankMin) && (value <= rankMax) && 
         // if highest and lowest are within 4, not duplicates, 
-        //and within the min/max range then it's a straight
+        // and within the min/max range then it's a straight
         (countDuplicates(cardRanksArr) === 0) && (rankMax - rankMin === 4) && 
         handArr.length > 0)) { 
         return true;
@@ -724,7 +719,7 @@ function getWinningHand(handArr) {
             }
         }
     }
-    // itterate through winning hands, return first hand with all true values else return false
+    // iterate through winning hands, return first hand with all true values else return false
     for(const hand in winningHands) {
         if(Object.values(winningHands[hand].rules).every(value => value === true)) { 
             return [hand,winningHands[hand].value];

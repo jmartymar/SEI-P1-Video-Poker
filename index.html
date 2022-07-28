@@ -15,7 +15,7 @@
     <script defer src="js/app.js"></script>
 
 </head>
-<body>
+<body class=" bg-success">
     <div class="container">
         <h1 class="title text-center">Video Poker But Awesomer™</h1>
         <div class="row">
@@ -180,17 +180,17 @@
             </div>
         </div>
         <div class="game-actions-row row">
-            <div class="col-3 bg-danger text-center mt-auto">
+            <div class="col-3 text-center">
                 <div class="row">
-                    <div id="chip-pile" class="col-12 bg-info">
+                    <div id="chip-pile" class="col-12">
                         <canvas id="chip-canvas">
 
                         </canvas>
                     </div>
                 </div>
                 <div class="row">
-                    <div id="chip-total" class="col-12 bg-warning">
-                        Chip Total
+                    <div id="chip-total" class="col-12">
+                        $0
                     </div>
                 </div>
             </div>
@@ -213,7 +213,7 @@
                     </div>
 
                     <div class="col-5 d-inline-block" id="deal-hand-tooltip" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Add a bet and funds to play!">
-                        <button id="deal-button" type="button" class="btn btn-warning">Deal Hand</button>
+                        <button id="deal-button" type="button" class="btn btn-warning" disabled>Deal Hand</button>
                     </div>
                 </div>
             </div>
@@ -223,7 +223,7 @@
                         <button id="add-funds-button" type="button" class="btn btn-primary col-12" data-bs-toggle="modal" data-bs-target="#add-funds-button-modal">Add Funds</button>
                     </div>
                 </div>
-                <div class="row"></div>
+                <div class="row">
                     <div id="music-btn-div" class="col-10 offset-1">
                         <button id="play-music-btn" type="button" class="btn btn-warning col-12">Play Music</button>
                         <input type="range" id="volume-control">
