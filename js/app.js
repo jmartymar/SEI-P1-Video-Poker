@@ -58,7 +58,8 @@ const spriteCols = 5;
 const spriteRows = 2;
 const chipImages = new Image();
 chipImages.crossOrigin='anonymous';
-chipImages.src = 'https://raw.githubusercontent.com/jmartymar/SEI-P1-Video-Poker/main/images/chips-spritesheet-128x72.png';
+chipImages.src = 
+    'https://raw.githubusercontent.com/jmartymar/SEI-P1-Video-Poker/main/images/chips-spritesheet-128x72.png';
 const spriteMapObj = {
     7: {
         increment: 1000000,
@@ -139,7 +140,7 @@ addFundsButtonEl.addEventListener('click', () => {
     
 });
 
-init();
+// display add funds modal on page load
 $(document).ready(function(){
     $('#add-funds-button-modal').modal('show');
     backgroundMusic.muted = true;
@@ -179,7 +180,9 @@ function addFunds() {
     if(venmoInputEl.value) {
         venmo = true;
     }
-    depositAmount = depositAmountEl.value.replace(/\$|,/g, '');
+    depositAmountEl.value != '' ? 
+        depositAmount = depositAmountEl.value.replace(/\$|,/g, '') :
+        depositAmount = 0;
     if(!isNaN(depositAmount)) {
         chipTotal += +depositAmount;
         addFundsConfirmEl.classList.remove('d-none');
@@ -323,7 +326,16 @@ function resetBoard() {
 }
 
 function getTile(x, y, chipX, chipY) {
-    ctx.drawImage(chipImages, x * spriteWidth + 1, y * spriteHeight + 1, spriteWidth, spriteHeight, chipX, chipY, 64, 32);
+    ctx.drawImage(
+        chipImages, 
+        x * spriteWidth + 1, 
+        y * spriteHeight + 1, 
+        spriteWidth, 
+        spriteHeight, 
+        chipX, 
+        chipY, 
+        64, 
+        32);
     return chipCanvasEl.toDataURL('image/png');
 }
 
