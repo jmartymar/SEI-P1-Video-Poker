@@ -132,7 +132,6 @@ addFundsSaveButtonEl.addEventListener('click', () => {
         venmoInputEl.classList.remove('d-none');
         $('#add-funds-button-modal').modal('hide');
     }, 2000);
-
 });
 
 dealButtonEl.addEventListener('click', () => {
@@ -301,16 +300,6 @@ function playHand() {
     render();
 }
 
-// https://www.tutorialspoint.com/convert-number-to-tens-hundreds-thousands-and-so-on-javascript
-const placeValue = (num, res = [], factor = 1) => {
-    if(num){
-       const val = (num % 10) * factor;
-       res.unshift(val);
-       return placeValue(Math.floor(num / 10), res, factor * 10);
-    };
-    return res;
- };
-
 /*----- view functions -----*/
 function resetBoard() {
     for(let cardEl in cardEls) {
@@ -440,9 +429,7 @@ function render() {
         betButtonEls.forEach((buttonEl) => {
             buttonEl.disabled = true;
         })
-
-     }
-    
+     }    
     // update chip total text
     chipTotalEl.innerText = '$' + chipTotal.toLocaleString('en-US'); 
     document.getElementById('current-bet').innerText = 'Current bet: ' + betAmount;
@@ -457,8 +444,7 @@ function render() {
     }
     if(chipTotal >= 0) {
         drawChips();
-    }
-    
+    }    
     if(chipTotal === 0 && betAmount === 0) {
         document.getElementById('deal-hand-tooltip').setAttribute('title', 'Add a bet and funds to play!');
         $(function () {
@@ -747,12 +733,23 @@ function countDuplicates(arr) {
     }
     return Object.values(countsByItem).filter(val => val >= 2).length;
 }
+
 function getValueMatches(arr) {
     return arr.reduce((acc, value) => {
         acc[value] ? acc[value]++ : acc[value] = 1
         return acc;
     }, {});
 }
+
+// https://www.tutorialspoint.com/convert-number-to-tens-hundreds-thousands-and-so-on-javascript
+const placeValue = (num, res = [], factor = 1) => {
+    if(num){
+       const val = (num % 10) * factor;
+       res.unshift(val);
+       return placeValue(Math.floor(num / 10), res, factor * 10);
+    };
+    return res;
+ };
 
 
 
