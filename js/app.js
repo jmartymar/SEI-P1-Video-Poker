@@ -228,7 +228,6 @@ function standCard(num) {
 
 function buildCardsObj() {
     let cardFace;
-    let i = 0;
     const cardsObj = {};
     const cardsArr = [];
     for(let cardSuit of cardSuits) {
@@ -240,7 +239,6 @@ function buildCardsObj() {
                 imgUrl: 'images/' + cardSuit + '/' + cardFace + '.svg'
             }
             cardsArr.push(cardFace);
-        i++;
         }
     }
     return [cardsObj,cardsArr];
