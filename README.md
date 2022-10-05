@@ -31,7 +31,7 @@ Now with mouse support!
 
 ## Getting Started
 
-1. Open the game in your browser - <a href="https://jmartymar.github.io/SEI-P1-Video-Poker/">https://jmartymar.github.io/SEI-P1-Video-Poker/</a> (hosted by GitHub Pages).
+1. Open the game in your browser - <a href="https://jsquarem.github.io/SEI-P1-Video-Poker/">https://jsquarem.github.io/SEI-P1-Video-Poker/</a> (hosted by GitHub Pages).
 2. Click on add funds to desposit funds up to $9,999,9999.
 3. Set your bet amount.
 4. Play!
